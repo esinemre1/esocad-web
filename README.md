@@ -30,9 +30,3 @@ Netcad NCZ ve CBS (GIS) ekosisteminin tüm yeteneklerini modern HTML5, CSS3 ve s
    - İl, İlçe, Mahalle, Ada, Parsel canlı sorgulama ve doğrudan haritaya çizim
    - Kalıcı Parsel Hafızası (LocalStorage) ve CAD (DXF) indirme
 
-## Çalıştırma
-
-Sunucu şu an aktif durumdadır:
-👉 **http://localhost:50080**
-
-İlerleyen zamanlarda sunucuyu tekrar başlatmak için `I:\CABBAR\CEPNCZ\web_cepncz\baslat.bat` dosyasına çift tıklayabilirsiniz.
