@@ -1,0 +1,23 @@
+{
+  "name": "esocad-web",
+  "version": "1.0.0",
+  "description": "EsoCAD Web - Netcad NCZ, CAD ve TKGM MEGSİS Harita Platformu",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "cad",
+    "netcad",
+    "ncz",
+    "tkgm",
+    "harita",
+    "gis"
+  ],
+  "author": "EsoCAD",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

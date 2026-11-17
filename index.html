@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Birincil SEO Meta Etiketleri (Primary Meta Tags) -->
+  <title>EsoCAD | Online Netcad NCZ Görüntüleyici & TKGM Canlı Parsel Sorgulama</title>
+  <meta name="title" content="EsoCAD | Online Netcad NCZ Görüntüleyici & TKGM Canlı Parsel Sorgulama">
+  <meta name="description" content="EsoCAD ile Netcad NCZ dosyalarını tarayıcınızda anında açın ve görüntüleyin. Resmi TKGM MEGSİS canlı parsel sorgulama, ITRF96 projeksiyon desteği, AutoCAD DXF, KML ve CSV dönüştürücü. Kurulumsuz, ücretsiz ve hızlı online web CAD platformu.">
+  <meta name="keywords" content="netcad açıcı, ncz görüntüleyici, online ncz okuyucu, web cad, tkgm parsel sorgulama, megsis canlı parsel, itrf96 tm33, dxf çevirici, harita mühendisliği, kadastro parsel sorgu, esocad, ncz to dxf, ncz to kml, harita kadastro web cad">
+  <meta name="author" content="EsoCAD">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  <link rel="canonical" href="https://esocad.com/">
+
+  <!-- Tema ve Mobil Uygulama (PWA & Manifest) -->
+  <meta name="theme-color" content="#ea580c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="EsoCAD">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <link rel="apple-touch-icon" href="icon.svg">
+
+  <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://esocad.com/">
+  <meta property="og:title" content="EsoCAD | Online Netcad NCZ Görüntüleyici & TKGM Canlı Parsel Sorgulama">
+  <meta property="og:description" content="Netcad NCZ dosyalarını tarayıcınızda açın, TKGM MEGSİS ile canlı parsel sorgulayın, AutoCAD DXF ve KML formatına dönüştürün. Kurulumsuz ve ücretsiz.">
+  <meta property="og:image" content="https://esocad.com/icon.svg">
+  <meta property="og:site_name" content="EsoCAD">
+  <meta property="og:locale" content="tr_TR">
+
+  <!-- Twitter Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://esocad.com/">
+  <meta name="twitter:title" content="EsoCAD | Online Netcad NCZ Görüntüleyici & TKGM Canlı Parsel Sorgulama">
+  <meta name="twitter:description" content="Netcad NCZ dosyalarını tarayıcınızda açın, TKGM MEGSİS ile canlı parsel sorgulayın, AutoCAD DXF ve KML formatına dönüştürün.">
+  <meta name="twitter:image" content="https://esocad.com/icon.svg">
+
+  <!-- Preconnect (Hızlı Harita ve API Yüklemesi İçin) -->
+  <link rel="preconnect" href="https://mt0.google.com">
+  <link rel="preconnect" href="https://mt1.google.com">
+  <link rel="preconnect" href="https://cbsapi.tkgm.gov.tr">
+
+  <!-- Yapılandırılmış Veri: SoftwareApplication (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "EsoCAD",
+    "operatingSystem": "All (Web Browser)",
+    "applicationCategory": "DesignApplication",
+    "browserRequirements": "Requires JavaScript. Requires HTML5 Canvas.",
+    "url": "https://esocad.com/",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "TRY"
+    },
+    "description": "Netcad NCZ dosyalarını web tarayıcısında anında açıp görüntüleyen, TKGM MEGSİS canlı parsel sorgulayan, AutoCAD DXF ve Google Earth KML formatlarına dönüştüren online web CAD platformu.",
+    "featureList": [
+      "Netcad binary NCZ dosyalarını doğrudan tarayıcıda açma",
+      "TKGM MEGSİS resmi sunucularından canlı kadastro parsel sorgulama",
+      "ITRF96 (3 derece dilimler: TM27, TM30, TM33, TM36) geodezik projeksiyon desteği",
+      "AutoCAD R2000 LWPOLYLINE uyumlu DXF dışa aktarma",
+      "Google Earth WGS84 KML dışa aktarma",
+      "Excel ve CSV uyumlu koordinat cetveli üretimi",
+      "Google Uydu, Hibrit, Arazi ve OpenStreetMap harita altlıkları",
+      "Hassas CAD snap yakalama ve mesafe / alan ölçüm motoru"
+    ]
+  }
+  </script>
+
+  <!-- Yapılandırılmış Veri: Sıkça Sorulan Sorular FAQPage (JSON-LD) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Netcad NCZ dosyası programsız internet üzerinden nasıl açılır?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "EsoCAD web sitesine girerek NCZ dosyanızı tarayıcı penceresine sürükleyip bırakabilir veya 'Dosya Aç' düğmesiyle seçebilirsiniz. Hiçbir kurulum veya lisans gerektirmeden çiziminiz tüm tabaka, çizgi, sembol ve yazılarıyla anında açılır."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "TKGM MEGSİS canlı parsel sorgulama nasıl yapılır?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "EsoCAD sol panelindeki 'Parsel Sorgu' menüsünü açarak İl, İlçe, Mahalle ve Ada/Parsel numarasını girip sorgulama yapabilirsiniz. Parsel sınırları otomatik olarak ITRF geodezik koordinatlarına dönüştürülüp harita üzerinde çizilir ve köşe koordinatları listelenir."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "NCZ dosyasını AutoCAD DXF formatına dönüştürebilir miyim?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Evet. EsoCAD içinde açtığınız herhangi bir NCZ dosyasını veya sorguladığınız TKGM parselini 'AutoCAD (DXF) İndir' butonuna basarak Netcad ve AutoCAD ile %100 uyumlu R2000 DXF formatında anında indirebilirsiniz."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "EsoCAD hangi harita projeksiyonlarını destekler?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "EsoCAD; Türkiye standartlarında kullanılan tüm ITRF96 (TM27, TM30, TM33, TM36), ED50 3° kadastro dilimleri ve WGS84 UTM 6° dilimlerini destekler. Ayrıca Google Uydu ve Hibrit katmanlarını çiziminizin altına otomatik hizalar."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+  <!-- Local Proj4.js for Geodetic Projection Transforms -->
+  <script src="proj4.js"></script>
+</head>
+<body>
+  <!-- Tek Satır Klasik Masaüstü Menü Çubuğu (EsoCAD Ergonomic Menubar - 32px) -->
+  <header class="app-menubar" id="appMenubar">
+    <!-- Sol: Marka Logosu & Başlık -->
+    <div class="menubar-brand" title="EsoCAD Web CAD & GIS Platformu">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+        <polyline points="2 17 12 22 22 17"></polyline>
+        <polyline points="2 12 12 17 22 12"></polyline>
+      </svg>
+      <span class="brand-title">Eso<b>CAD</b></span>
+    </div>
+
+    <!-- Klasik Masaüstü Açılır Menü Başlıkları -->
+    <nav class="menubar-nav" id="menubarNav">
+      <!-- 1. DOSYA MENÜSÜ -->
+      <div class="menubar-item">
+        <button class="menubar-btn" data-menu="menu-dosya">Dosya ▾</button>
+        <div class="menubar-dropdown" id="menu-dosya">
+          <div class="menu-action" id="btnOpenFile">
+            <span class="menu-label">NCZ Dosyası Aç...</span>
+            <span class="menu-shortcut">Ctrl+O</span>
+          </div>
+          <div class="menu-action" id="btnToggleLayers">
+            <span class="menu-label">Tabakalar ve Renkler...</span>
+            <span class="menu-shortcut">Ctrl+L</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action highlight" id="btnExportDxf">
+            <span class="menu-label">AutoCAD (DXF) İndir</span>
+            <span class="menu-tag" style="background:#1f6feb;">R2000</span>
+          </div>
+          <div class="menu-action" id="btnExportCsv">
+            <span class="menu-label">Excel / CSV Koordinat Cetveli (Y-X-Z)</span>
+            <span class="menu-shortcut">Excel</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnExportKml">
+            <span class="menu-label">Google Earth (KML) İndir</span>
+          </div>
+          <div class="menu-action" id="btnExportGeoJson">
+            <span class="menu-label">CBS (GeoJSON) İndir</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. TABAKA MENÜSÜ (YENİ ZENGİNLEŞTİRİLMİŞ CAD TABAKA YÖNETİMİ) -->
+      <div class="menubar-item">
+        <button class="menubar-btn" data-menu="menu-tabaka">Tabaka ▾</button>
+        <div class="menubar-dropdown" id="menu-tabaka">
+          <div class="menu-action highlight" id="mBtnOpenLayerPanel">
+            <span class="menu-label">Tabaka Yöneticisi Paneli...</span>
+            <span class="menu-shortcut">Ctrl+L</span>
+          </div>
+          <div class="menu-action" id="mBtnAddNewLayer">
+            <span class="menu-label">➕ Yeni Tabaka Ekle...</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="mBtnAllLayersOn">
+            <span class="menu-label">👁 Tüm Tabakaları Aç</span>
+          </div>
+          <div class="menu-action" id="mBtnAllLayersOff">
+            <span class="menu-label">🙈 Tüm Tabakaları Kapat</span>
+          </div>
+          <div class="menu-action" id="mBtnInvertLayers">
+            <span class="menu-label">🔄 Tabakaları Tersine Çevir (Invert)</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="mBtnAllLayerTextsOn">
+            <span class="menu-label">📝 Tüm Tabaka Yazılarını Aç</span>
+          </div>
+          <div class="menu-action" id="mBtnAllLayerTextsOff">
+            <span class="menu-label">🚫 Tüm Tabaka Yazılarını Kapat</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="mBtnTogglePointNames">
+            <span class="menu-label" id="mPointNamesLabel">🏷️ Nokta Adları: Açık</span>
+            <span class="menu-shortcut">N</span>
+          </div>
+          <div class="menu-action" id="mBtnAllPointNamesOn">
+            <span class="menu-label">🏷️ Nokta Adlarını Aç</span>
+          </div>
+          <div class="menu-action" id="mBtnAllPointNamesOff">
+            <span class="menu-label">🚫 Nokta Adlarını Kapat</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="mBtnFilterNonEmpty">
+            <span class="menu-label">Sadece Dolu Tabakaları Filtrele</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. GIS & UYDU MENÜSÜ -->
+      <div class="menubar-item">
+        <button class="menubar-btn" data-menu="menu-gis">GIS & Uydu ▾</button>
+        <div class="menubar-dropdown" id="menu-gis">
+          <div class="menu-action" id="btnSatellite">
+            <span class="menu-label" id="satStatusLabel">Google Uydu: Kapalı</span>
+            <span class="menu-badge" id="satIndicator">GIS</span>
+          </div>
+          <div class="menu-sep"></div>
+          
+          <!-- Altlık Katmanı Seçici -->
+          <div class="menu-section-title">HARİTA ALTLIĞI</div>
+          <div id="drop-sat-settings" class="menu-subgroup">
+            <div class="menu-action dropdown-item" data-sat-provider="google-hybrid">Google Hibrit (Uydu + Yol)</div>
+            <div class="menu-action dropdown-item" data-sat-provider="google-satellite">Google Uydu (Saf Hava Fotoğrafı)</div>
+            <div class="menu-action dropdown-item" data-sat-provider="google-terrain">Google Arazi (Topoğrafya)</div>
+            <div class="menu-action dropdown-item" data-sat-provider="google-roads">Google Sokak Haritası</div>
+            <div class="menu-action dropdown-item" data-sat-provider="esri">Esri World Imagery (Yüksek Çözünürlük)</div>
+            <div class="menu-action dropdown-item" data-sat-provider="osm">OpenStreetMap (OSM)</div>
+            <div class="menu-action dropdown-item" data-sat-provider="carto-dark">CartoDB Koyu (CAD Teması)</div>
+            <div class="menu-sep"></div>
+            <div class="menu-section-title">SAYDAMLIK (OPACITY)</div>
+            <div class="menu-action dropdown-item" data-sat-opacity="1.0">Saydamlık: %100 (Net)</div>
+            <div class="menu-action dropdown-item" data-sat-opacity="0.85">Saydamlık: %85 (Önerilen)</div>
+            <div class="menu-action dropdown-item" data-sat-opacity="0.70">Saydamlık: %70 (Dengeli)</div>
+            <div class="menu-action dropdown-item" data-sat-opacity="0.50">Saydamlık: %50 (Yarı Saydam)</div>
+            <div class="menu-action dropdown-item" data-sat-opacity="0.30">Saydamlık: %30 (Hafif Zemin)</div>
+          </div>
+
+          <div class="menu-sep"></div>
+          <!-- Projeksiyon Seçimi -->
+          <div class="menu-section-title">PROJEKSİYON DİLİMİ</div>
+          <div id="drop-proj" class="menu-subgroup">
+            <div class="menu-action dropdown-item" data-proj="NONE" id="btnProjSelect">
+              <span id="projLabel">Projeksiyon: Yok (CAD)</span>
+            </div>
+            <div class="menu-action dropdown-item" data-proj="ITRF33">ITRF96 / TM33 (Dilim 33 - İç Anadolu/Konya/Ankara)</div>
+            <div class="menu-action dropdown-item" data-proj="ITRF30">ITRF96 / TM30 (Dilim 30 - Marmara/İstanbul/İzmir)</div>
+            <div class="menu-action dropdown-item" data-proj="ITRF36">ITRF96 / TM36 (Dilim 36 - Karadeniz/Trabzon/Adana)</div>
+            <div class="menu-action dropdown-item" data-proj="ITRF27">ITRF96 / TM27 (Dilim 27 - Trakya/Çanakkale)</div>
+            <div class="menu-action dropdown-item" data-proj="ED50_TM33">ED50 / TM33 (Eski Kadastro 3° Dilim 33)</div>
+            <div class="menu-action dropdown-item" data-proj="ED50_TM30">ED50 / TM30 (Eski Kadastro 3° Dilim 30)</div>
+            <div class="menu-action dropdown-item" data-proj="ED50_TM36">ED50 / TM36 (Eski Kadastro 3° Dilim 36)</div>
+            <div class="menu-action dropdown-item" data-proj="ED50_TM27">ED50 / TM27 (Eski Kadastro 3° Dilim 27)</div>
+            <div class="menu-action dropdown-item" data-proj="UTM35">WGS84 / UTM 35 (6° Dilim)</div>
+            <div class="menu-action dropdown-item" data-proj="UTM36">WGS84 / UTM 36 (6° Dilim)</div>
+            <div class="menu-action dropdown-item" data-proj="UTM37">WGS84 / UTM 37 (6° Dilim)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. PARSEL & TKGM MENÜSÜ -->
+      <div class="menubar-item">
+        <button class="menubar-btn accent" data-menu="menu-parsel">Parsel & TKGM ▾</button>
+        <div class="menubar-dropdown" id="menu-parsel">
+          <div class="menu-action highlight" id="btnTkgmQuery">
+            <span class="menu-label">🔍 TKGM Canlı Parsel Sorgula...</span>
+            <span class="menu-tag">MEGSİS</span>
+          </div>
+          <div class="menu-action" id="btnSavedParcels">
+            <span class="menu-label" id="savedParcelsCountLabel">Kayıtlı Parseller / Hafıza...</span>
+            <span class="menu-shortcut">Kayıtlar</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnParcelInfo">
+            <span class="menu-label">Seçili Parsel Bilgisi (Alan & Çevre)</span>
+          </div>
+          <div class="menu-action" id="btnParcelTable">
+            <span class="menu-label">Köşe - Kenar - Semt Cetveli Tablosu</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnParcelLabels">
+            <span class="menu-label">Tüm Kenar Boylarını Çizime Yazdır</span>
+          </div>
+          <div class="menu-action" id="btnParcelSaveCorners">
+            <span class="menu-label">Parsel Köşelerini Nokta Listesine Ekle</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnMeasureLabel">
+            <span class="menu-label">Tek Kenara Boy Yazdır (Tıkla)</span>
+          </div>
+          <div class="menu-action" id="btnMeasureClearLabels">
+            <span class="menu-label">Tüm Kenar Boyu Yazılarını Temizle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. İŞLEM & ÖLÇÜM MENÜSÜ -->
+      <div class="menubar-item">
+        <button class="menubar-btn" data-menu="menu-islem">İşlem & Ölçüm ▾</button>
+        <div class="menubar-dropdown" id="menu-islem">
+          <div class="menu-action active-mode" id="btnQuerySelect">
+            <span class="menu-label">Obje / Parsel Seçim Modu</span>
+            <span class="menu-shortcut">Esc / S</span>
+          </div>
+          <div class="menu-action" id="btnQueryArea">
+            <span class="menu-label">Mevcut Kapalı Alanı Sorgula</span>
+            <span class="menu-shortcut">A</span>
+          </div>
+          <div class="menu-action" id="btnMeasureFreeArea">
+            <span class="menu-label">📐 Serbest Çokgen Alanı & Çevresi</span>
+            <span class="menu-shortcut">Shift+A</span>
+          </div>
+          <div class="menu-action" id="btnMeasureDist">
+            <span class="menu-label">📏 2 Nokta Arası Mesafe & Eğim</span>
+            <span class="menu-shortcut">M</span>
+          </div>
+          <div class="menu-action" id="btnMeasurePoly">
+            <span class="menu-label">〰 Kırık Hat Toplam Mesafe</span>
+            <span class="menu-shortcut">K</span>
+          </div>
+          <div class="menu-action" id="btnMeasureAngle">
+            <span class="menu-label">📐 3 Nokta ile Kırıklık Açısı (° / gon)</span>
+            <span class="menu-shortcut">Shift+K</span>
+          </div>
+          <div class="menu-action" id="btnMeasurePerpendicular">
+            <span class="menu-label">📍 Hatta Dik Ayak - Dik Boy Ölçümü</span>
+            <span class="menu-shortcut">Shift+D</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnFindOpenPolygons">
+            <span class="menu-label">🔍 Kapanmayan Parselleri Bul (Açık Uç)</span>
+          </div>
+          <div class="menu-action" id="btnClearTopologyErrors">
+            <span class="menu-label">Topoloji Hata İşaretlerini Temizle</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnMeasureClear">
+            <span class="menu-label">✕ Ölçümleri Temizle</span>
+            <span class="menu-shortcut">Esc</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. NOKTA & SNAP MENÜSÜ -->
+      <div class="menubar-item">
+        <button class="menubar-btn" data-menu="menu-snap">Nokta & Snap ▾</button>
+        <div class="menubar-dropdown" id="menu-snap">
+          <div class="menu-action" id="btnCadToggleSnap">
+            <span class="menu-label" id="snapStatusText">Snap Motoru: Açık</span>
+            <span class="menu-shortcut">F3</span>
+          </div>
+          <div class="menu-action" id="btnPointCapture">
+            <span class="menu-label">Snap ile Nokta Yakala ve Kaydet</span>
+          </div>
+          <div class="menu-action" id="btnSnapSettings">
+            <span class="menu-label">Snap Ayarları (Uç, Orta, Kesişim)...</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnPointManual">
+            <span class="menu-label">Y - X Elle Koordinat Ekle...</span>
+          </div>
+          <div class="menu-action" id="btnPointSaveCurrent">
+            <span class="menu-label">Son Konumu Nokta Olarak Kaydet</span>
+          </div>
+          <div class="menu-action" id="btnPointList">
+            <span class="menu-label">Nokta Listesini Göster / Yönet...</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnPointClear">
+            <span class="menu-label">Kayıtlı Noktaları Temizle</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. GÖRÜNÜM MENÜSÜ -->
+      <div class="menubar-item">
+        <button class="menubar-btn" data-menu="menu-gorunum">Görünüm ▾</button>
+        <div class="menubar-dropdown" id="menu-gorunum">
+          <div class="menu-action" id="btnFit">
+            <span class="menu-label">Tümünü Ekrana Sığdır</span>
+            <span class="menu-shortcut">Home</span>
+          </div>
+          <div class="menu-action" id="btnZoomWindow">
+            <span class="menu-label">Pencere Açarak Yakınlaş</span>
+            <span class="menu-shortcut">W</span>
+          </div>
+          <div class="menu-action" id="btnZoomSelected">
+            <span class="menu-label">Seçili Objeye Odaklan</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnZoomPrev">
+            <span class="menu-label">Önceki Görünüme Dön</span>
+            <span class="menu-shortcut">Ctrl+Z</span>
+          </div>
+          <div class="menu-action" id="btnZoomNext">
+            <span class="menu-label">Sonraki Görünüme Git</span>
+            <span class="menu-shortcut">Ctrl+Y</span>
+          </div>
+          <div class="menu-action" id="btnGotoCoord">
+            <span class="menu-label">Koordinata / Noktaya Git (Radar Efekti)...</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnToggleMinimap">
+            <span class="menu-label" id="minimapStatusLabel">Kuşbakışı (Minimap): Açık</span>
+          </div>
+          <div class="menu-action" id="btnToggleAreas">
+            <span class="menu-label" id="textToggleLabel">Çizim Yazıları: Açık</span>
+          </div>
+          <div class="menu-action" id="btnTogglePointNames">
+            <span class="menu-label" id="pointNamesLabel">Nokta Adları: Açık</span>
+          </div>
+          <div class="menu-action" id="btnCycleTextScale">
+            <span class="menu-label">Yazı & Nokta Boyutu: <b id="textScaleLabel">1.0x (Normal)</b></span>
+          </div>
+          <div class="menu-action" id="btnTogglePoints">
+            <span class="menu-label">Köşe Noktaları: <b id="pointStatusLabel">Gizli</b></span>
+          </div>
+          <div class="menu-action" id="btnToggleElevations">
+            <span class="menu-label">Nokta Kot Değerleri (Z): <b id="elevStatusLabel">Gizli</b></span>
+          </div>
+          <div class="menu-action" id="btnCycleFill">
+            <span class="menu-label">Tarama / Dolgu Modu: <b id="fillModeLabel">Yok</b></span>
+          </div>
+          <div class="menu-action" id="btnToggleEdgeLengths">
+            <span class="menu-label">Seçili Kenar Boyları: <b id="edgeLenStatusLabel">Gizli</b></span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="btnToggleTheme">
+            <span class="menu-label" id="themeStatusLabel">CAD Teması: Beyaz & Turuncu</span>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Sağ: Durum ve Hızlı Eylemler (Yer Kaplamayan İnce Kontroller) -->
+    <div class="menubar-right">
+      <!-- Hızlı Hızlı Butonlar: TKGM ve Tabaka -->
+      <button class="quick-nav-btn accent" id="qBtnTkgm" title="TKGM Canlı Parsel Sorgula">
+        🔍 TKGM
+      </button>
+      <button class="quick-nav-btn" id="qBtnLayers" title="Tabakalar (Ctrl+L)">
+        Tabakalar
+      </button>
+      <button class="quick-nav-btn" id="qBtnFitScreen" title="Tümünü Sığdır (Home)">
+        ⤢ Sığdır
+      </button>
+
+      <!-- Açık Dosya Adı -->
+      <div class="menubar-fileinfo" id="fileInfo" title="Açık NCZ Dosyası">
+        NCZ dosyası bekleniyor...
+      </div>
+
+      <!-- Tam Ekran Butonu -->
+      <button class="menubar-icon-btn" id="btnFullScreen" title="Tam Ekran Modu (F11)">
+        ⛶
+      </button>
+    </div>
+  </header>
+
+  <!-- Gizli / Geriye Uyumluluk Destek Öğeleri -->
+  <div style="display:none" id="ribbonBar">
+    <button id="btnToggleRibbon"><span id="ribbonToggleIcon"></span></button>
+  </div>
+
+  <!-- Workspace (Ekranın Tamamı CAD & Harita Çizimine Ayrıldı) -->
+  <main class="workspace" id="workspace">
+    <canvas id="cadCanvas"></canvas>
+
+    <!-- Sol Kenar Dock Butonu: Parsel Sorgu Paneli Hızlı Aç/Kapat -->
+    <button class="panel-dock-pill left" id="btnToggleParcelDock" title="TKGM Parsel Sorgu Panelini Aç/Kapat">
+      📍 PARSEL SORGU
+    </button>
+
+    <!-- Sağ Kenar Dock Butonu: Tabaka Paneli Hızlı Aç/Kapat -->
+    <button class="panel-dock-pill right" id="btnToggleLayerDock" title="Tabaka Panelini Aç/Kapat">
+      📑 TABAKALAR
+    </button>
+
+    <div class="north-arrow">
+      ↑
+      <span>K</span>
+    </div>
+
+    <div class="quick-pad">
+      <button class="quick-btn" id="qZoomIn" title="Yakınlaştır">+</button>
+      <button class="quick-btn" id="qZoomOut" title="Uzaklaştır">−</button>
+      <button class="quick-btn fit" id="qFit" title="Tümünü Sığdır">SIĞDIR</button>
+    </div>
+
+    <!-- Tıklanan Obje / Tabaka Canlı Bilgi Penceresi (Kuşbakışı Üstü) -->
+    <div class="entity-info-box hidden" id="entityInfoBox">
+      <div class="entity-info-header">
+        <div class="entity-info-title-wrap">
+          <span class="entity-info-color-indicator" id="entInfoColor"></span>
+          <span class="entity-info-title" id="entInfoTitle">TABAKA BİLGİSİ</span>
+        </div>
+        <button class="entity-info-close-btn" id="btnEntityInfoClose" title="Kapat">✕</button>
+      </div>
+      <div class="entity-info-body">
+        <div class="ent-row">
+          <span class="ent-label">Tabaka:</span>
+          <span class="ent-val bold" id="entInfoLayer">---</span>
+        </div>
+        <div class="ent-row">
+          <span class="ent-label">Geometri:</span>
+          <span class="ent-val" id="entInfoKind">---</span>
+        </div>
+        <div class="ent-row" id="entRowArea" style="display:none;">
+          <span class="ent-label">Alan:</span>
+          <span class="ent-val highlight" id="entInfoArea">---</span>
+        </div>
+        <div class="ent-row" id="entRowLength" style="display:none;">
+          <span class="ent-label">Uzunluk:</span>
+          <span class="ent-val" id="entInfoLength">---</span>
+        </div>
+        <div class="ent-row" id="entRowPerimeter" style="display:none;">
+          <span class="ent-label">Çevre:</span>
+          <span class="ent-val" id="entInfoPerimeter">---</span>
+        </div>
+        <div class="ent-row" id="entRowText" style="display:none;">
+          <span class="ent-label">Yazı/Etiket:</span>
+          <span class="ent-val" id="entInfoText">---</span>
+        </div>
+        <div class="ent-row">
+          <span class="ent-label">Konum:</span>
+          <span class="ent-val mono" id="entInfoCoord">---</span>
+        </div>
+      </div>
+      <div class="entity-info-footer">
+        <button class="ent-btn" id="btnEntZoom" title="Bu objeye odaklan">🎯 Odaklan</button>
+        <button class="ent-btn" id="btnEntCopy" title="Bilgileri kopyala">📋 Kopyala</button>
+        <button class="ent-btn" id="btnEntLayerSolo" title="Bu tabakayı izole et">👁️ İzole Et</button>
+      </div>
+    </div>
+
+    <!-- Kuşbakışı Minimap Navigasyon Penceresi -->
+    <div class="minimap-container" id="minimapContainer">
+      <div class="minimap-header">
+        <span class="minimap-title">KUŞBAKIŞI</span>
+        <button class="minimap-close-btn" id="btnMinimapClose" title="Gizle">✕</button>
+      </div>
+      <canvas id="minimapCanvas" width="190" height="135"></canvas>
+    </div>
+
+    <!-- Sol Taraf: TKGM MEGSİS Parsel Sorgu & Analiz Paneli (Açılır/Kapanır) -->
+    <aside class="parcel-panel hidden" id="parcelPanel">
+      <div class="parcel-panel-header">
+        <div class="parcel-panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+            <circle cx="12" cy="10" r="3"></circle>
+          </svg>
+          <h3>TKGM PARSEL SORGU</h3>
+        </div>
+        <button class="close-panel-btn" id="btnCloseParcelPanel" title="Paneli Kapat (Esc)">✕</button>
+      </div>
+
+      <!-- Panel Sekmeleri: Canlı Sorgu ve Kayıtlı Parseller -->
+      <div class="parcel-nav-tabs">
+        <button class="parcel-tab-btn active" id="tabParcelLive" data-target="viewParcelLive">
+          🔍 Canlı MEGSİS
+        </button>
+        <button class="parcel-tab-btn" id="tabParcelSaved" data-target="viewParcelSaved">
+          📂 Kayıtlılar (<span id="parcelSavedBadge">0</span>)
+        </button>
+      </div>
+
+      <!-- Sekme 1: Canlı TKGM Sorgulama Görünümü -->
+      <div class="parcel-tab-content active" id="viewParcelLive">
+        <div class="parcel-form-card">
+          <div class="parcel-field-group">
+            <label for="selPanelIl">İl Seçimi:</label>
+            <select id="selPanelIl" class="parcel-select">
+              <option value="">İller yükleniyor...</option>
+            </select>
+          </div>
+
+          <div class="parcel-field-group">
+            <label for="selPanelIlce">İlçe Seçimi:</label>
+            <select id="selPanelIlce" class="parcel-select" disabled>
+              <option value="">Önce il seçiniz...</option>
+            </select>
+          </div>
+
+          <div class="parcel-field-group">
+            <label for="selPanelMahalle">Mahalle / Köy:</label>
+            <select id="selPanelMahalle" class="parcel-select" disabled>
+              <option value="">Önce ilçe seçiniz...</option>
+            </select>
+          </div>
+
+          <div class="parcel-field-row">
+            <div class="parcel-field-group flex-1">
+              <label for="inputPanelAda">Ada No:</label>
+              <input type="text" id="inputPanelAda" class="parcel-input" placeholder="Örn: 101" autocomplete="off">
+            </div>
+            <div class="parcel-field-group flex-1">
+              <label for="inputPanelParsel">Parsel No:</label>
+              <input type="text" id="inputPanelParsel" class="parcel-input" placeholder="Örn: 5" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="parcel-form-actions">
+            <button class="parcel-btn primary" id="btnPanelQueryExec">
+              🔍 Parseli Sorgula ve Haritaya Ekle
+            </button>
+            <button class="parcel-btn secondary" id="btnPanelQueryClear" title="Formu Temizle">
+              Temizle
+            </button>
+          </div>
+
+          <!-- Canlı Durum ve İlerleme Mesajı -->
+          <div class="parcel-status-box" id="panelQueryStatus" style="display:none;"></div>
+        </div>
+
+        <!-- Kalıcı Sorgu Sonucu Kartı: Sorgulama Yapılınca Asla Kaybolmaz! -->
+        <div class="parcel-result-card" id="panelResultBox" style="display:none;">
+          <div class="result-header">
+            <div class="result-title-badge" id="resParcelBadge">PARSEL BİLGİSİ</div>
+            <div class="result-actions-top">
+              <button class="result-mini-btn" id="btnResZoom" title="Parseli Ekrana Ortala">🎯 Odak</button>
+              <button class="result-mini-btn" id="btnResSave" title="Hafızaya Kaydet">💾 Kaydet</button>
+              <button class="result-mini-btn danger" id="btnResRemove" title="Haritadan Sil">🗑️ Sil</button>
+            </div>
+          </div>
+
+          <div class="result-meta-grid">
+            <div class="result-meta-row">
+              <span class="meta-lbl">Konum:</span>
+              <span class="meta-val" id="resLocationText">-</span>
+            </div>
+            <div class="result-meta-row highlight">
+              <span class="meta-lbl">Ada / Parsel:</span>
+              <span class="meta-val bold" id="resAdaParselText">-</span>
+            </div>
+            <div class="result-meta-row">
+              <span class="meta-lbl">Tapu Alanı:</span>
+              <span class="meta-val bold accent" id="resTapuAlanText">-</span>
+            </div>
+            <div class="result-meta-row">
+              <span class="meta-lbl">CAD Hesap Alanı:</span>
+              <span class="meta-val" id="resCadAlanText">-</span>
+            </div>
+            <div class="result-meta-row">
+              <span class="meta-lbl">Çevre Uzunluğu:</span>
+              <span class="meta-val" id="resPerimeterText">-</span>
+            </div>
+            <div class="result-meta-row">
+              <span class="meta-lbl">Nitelik:</span>
+              <span class="meta-val" id="resNitelikText">-</span>
+            </div>
+            <div class="result-meta-row">
+              <span class="meta-lbl">Mevkii:</span>
+              <span class="meta-val" id="resMevkiiText">-</span>
+            </div>
+            <div class="result-meta-row">
+              <span class="meta-lbl">Projeksiyon & Dilim:</span>
+              <span class="meta-val" id="resProjText">-</span>
+            </div>
+          </div>
+
+          <!-- Köşe Koordinatları Özeti & Eylemler -->
+          <div class="result-coord-section">
+            <div class="result-coord-header">
+              <span>Köşe Koordinatları (<span id="resCornerCount">0</span> Nokta)</span>
+              <button class="result-text-btn" id="btnResCopyCoords" title="Netcad Y-X Formatında Panoya Kopyala">📋 Kopyala</button>
+            </div>
+            <div class="result-coord-table-wrap" id="resCoordTableWrap"></div>
+          </div>
+
+          <!-- Alt Butonlar -->
+          <div class="result-bottom-actions">
+            <button class="parcel-btn outline" id="btnResExportDxf">
+              📥 Parseli DXF Olarak İndir
+            </button>
+            <button class="parcel-btn outline" id="btnResDrawLabels">
+              🏷️ Kenar Boylarını Çizime Yaz
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sekme 2: Kayıtlı Parseller Listesi -->
+      <div class="parcel-tab-content" id="viewParcelSaved" style="display:none;">
+        <div class="saved-parcels-toolbar">
+          <input type="text" id="savedSearchInput" class="parcel-input" placeholder="Kayıtlı parsellerde ara..." autocomplete="off">
+          <button class="parcel-btn secondary sm" id="btnSavedClearAll" title="Tüm Kayıtları Temizle">Tümünü Sil</button>
+        </div>
+        <div class="saved-parcels-list" id="savedParcelsList">
+          <div class="saved-empty-msg">Henüz kayıtlı parsel bulunmamaktadır. Canlı sorgulama yapıp "Kaydet" butonuna basarak ekleyebilirsiniz.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Zenginleştirilmiş Profesyonel CAD Tabaka Paneli -->
+    <aside class="layer-panel hidden" id="layerPanel">
+      <div class="layer-panel-header">
+        <div class="layer-panel-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <h3>TABAKALAR (<span id="layerCountHeader">0</span>)</h3>
+        </div>
+        <div class="layer-panel-header-actions">
+          <button class="layer-add-btn" id="btnPanelAddLayer" title="Yeni Tabaka Ekle">➕ Yeni</button>
+          <button class="close-panel-btn" id="btnClosePanel" title="Paneli Kapat (Esc)">✕</button>
+        </div>
+      </div>
+
+      <!-- Hızlı İşlem Araçları -->
+      <div class="layer-actions">
+        <button id="btnAllLayersOn" title="Tüm Tabakaları Görünür Yap">TÜMÜ AÇ</button>
+        <button id="btnAllLayersOff" title="Tüm Tabakaları Gizle">TÜMÜ KAPAT</button>
+        <button id="btnInvertLayers" title="Tabaka Görünürlüklerini Tersine Çevir">TERS ÇEVİR</button>
+        <button id="btnSortLayers" title="Tabakaları Sırala (A-Z / Geometri Sayısı)">SIRALA</button>
+        <button id="btnPanelTogglePointNames" title="Nokta Adlarını Aç / Kapat">🏷️ NOKTALAR</button>
+      </div>
+
+      <!-- Arama ve Filtre Çubuğu -->
+      <div class="layer-search">
+        <input type="text" id="layerSearchInput" placeholder="🔍 Tabaka adı veya no ile ara..." autocomplete="off">
+      </div>
+
+      <!-- Canlı İstatistik Göstergesi -->
+      <div class="layer-stats-bar" id="layerStatsBar">
+        0 tabaka aktif • 0 toplam geometri
+      </div>
+
+      <!-- Tabaka Satırları Listesi -->
+      <div class="layer-list" id="layerListContainer"></div>
+    </aside>
+
+    <!-- Drag & Drop Zone -->
+    <div class="drop-zone" id="dropZone">
+      <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="17 8 12 3 7 8"></polyline>
+        <line x1="12" y1="3" x2="12" y2="15"></line>
+      </svg>
+      <span>NCZ Dosyasını Buraya Bırakın</span>
+    </div>
+  </main>
+
+  <!-- Alt Şerit: CAD Durum, Seçim & Canlı Koordinat Çubuğu (28px Bottombar) -->
+  <footer class="app-bottombar" id="appBottombar">
+    <!-- Sol: Seçim Menüsü & Hızlı Seçim Butonları -->
+    <div class="bottombar-left">
+      <!-- Seçim Açılır Menüsü (Dropup) -->
+      <div class="bottombar-item">
+        <button class="bottombar-btn accent" id="bBtnMenuSelect" data-bottommenu="menu-bottom-select" title="Seçim Araçları Menüsü">
+          Seçim ▴
+        </button>
+        <div class="bottombar-dropup" id="menu-bottom-select">
+          <div class="menu-action" id="bMenuSingleSelect">
+            <span class="menu-label">Tek Obje / Parsel Seç</span>
+            <span class="menu-shortcut">Esc / S</span>
+          </div>
+          <div class="menu-action" id="bMenuBoxSelect">
+            <span class="menu-label">Kutu ile Pencere Seçimi</span>
+            <span class="menu-shortcut">W</span>
+          </div>
+          <div class="menu-action" id="bMenuSelectAll">
+            <span class="menu-label">Tümünü Seç</span>
+            <span class="menu-shortcut">Ctrl+A</span>
+          </div>
+          <div class="menu-action" id="bMenuClearSelect">
+            <span class="menu-label">Seçimi Bırak / Temizle</span>
+            <span class="menu-shortcut">Esc</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="bMenuZoomSelected">
+            <span class="menu-label">Seçiliye Odaklan</span>
+            <span class="menu-shortcut">Z</span>
+          </div>
+          <div class="menu-action" id="bMenuCopyCoords">
+            <span class="menu-label">Koordinatları Panoya Kopyala</span>
+            <span class="menu-shortcut">Ctrl+C</span>
+          </div>
+          <div class="menu-action" id="bMenuSaveParcel">
+            <span class="menu-label">Seçili Parseli Hafızaya Kaydet</span>
+          </div>
+          <div class="menu-action" id="bMenuDeleteSelected">
+            <span class="menu-label">Seçiliyi Çizimden Sil</span>
+            <span class="menu-shortcut">Del</span>
+          </div>
+          <div class="menu-sep"></div>
+          <div class="menu-action" id="bMenuParcelTable">
+            <span class="menu-label">Köşe - Kenar Cetveli</span>
+          </div>
+          <div class="menu-action" id="bMenuParcelLabels">
+            <span class="menu-label">Kenar Boylarını Çizime Yazdır</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hızlı Seçim Butonları -->
+      <div class="bottom-quick-group">
+        <button class="bottom-quick-btn active" id="bBtnSelectMode" title="Tekil Seçim Modu (Tıkla)">
+          ⬚ Tekil
+        </button>
+        <button class="bottom-quick-btn" id="bBtnBoxSelect" title="Kutu / Pencere ile Seç (Sürükle)">
+          ⤧ Kutu
+        </button>
+        <button class="bottom-quick-btn" id="bBtnSelectAll" title="Tüm Çizimi Seç (Ctrl+A)">
+          🗹 Tümü
+        </button>
+        <button class="bottom-quick-btn" id="bBtnClearSelect" title="Seçimi İptal Et (Esc)">
+          ✕ Bırak
+        </button>
+        <button class="bottom-quick-btn" id="bBtnZoomSelected" title="Seçili Objeyi Ortala">
+          🎯 Odak
+        </button>
+      </div>
+    </div>
+
+    <!-- Orta: Durum ve Bilgi Bildirimi -->
+    <div class="bottombar-status">
+      <span class="status-indicator" id="statusIndicator">●</span>
+      <span class="bottombar-text" id="hudSelection">Hazır • Dosya açınız veya sürükleyip bırakınız</span>
+    </div>
+
+    <!-- Sağ: Netcad Koordinatları & Hızlı CAD Göstergeleri -->
+    <div class="bottombar-right">
+      <!-- Canlı Netcad Koordinatı: Y (Sağa / Easting) - X (Yukarı / Northing) -->
+      <div class="coord-display" id="bottomCoordDisplay" title="Netcad Standart Koordinatları (Y=Sağa, X=Yukarı)">
+        <span class="coord-prefix">Y:</span> <span id="valCoordY">---</span>
+        <span class="coord-sep">|</span>
+        <span class="coord-prefix">X:</span> <span id="valCoordX">---</span>
+      </div>
+
+      <!-- Zoom Seviyesi Rozeti -->
+      <div class="zoom-badge" id="hudNav" title="Zoom Yakınlaştırma Oranı">1.00x</div>
+
+      <!-- Hızlı Snap Toggle Düğmesi -->
+      <button class="bottom-toggle-btn active" id="bBtnSnap" title="Snap Motoru Aç/Kapat (F3)">
+        SNAP
+      </button>
+
+      <!-- Kuşbakışı Navigasyon Butonu -->
+      <button class="bottom-toggle-btn active" id="bBtnMinimap" title="Kuşbakışı Minimap Aç/Kapat">
+        MINIMAP
+      </button>
+    </div>
+  </footer>
+
+  <!-- Hidden File Input -->
+  <input type="file" id="fileInput" accept=".ncz" style="display:none">
+
+  <!-- Generic Modal Dialog -->
+  <div class="modal-overlay" id="genericModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h4 id="modalTitle">Bilgi</h4>
+        <button class="close-panel-btn" id="btnModalClose">✕</button>
+      </div>
+      <div class="modal-body" id="modalBody"></div>
+      <div class="modal-footer" id="modalFooter">
+        <button class="modal-btn primary" id="btnModalOk">TAMAM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Semantik SEO & Arama Motoru İndeksleme Bölümü (Screen Reader & Crawler Content) -->
+  <article class="sr-only" aria-label="EsoCAD Web CAD Platformu ve Harita Çözümleri">
+    <h1>EsoCAD: Online Netcad NCZ Görüntüleyici ve TKGM MEGSİS Canlı Parsel Sorgulama</h1>
+    <p>
+      EsoCAD, harita mühendisleri, kadastro teknisyenleri, şehir plancıları ve inşaat profesyonelleri için geliştirilmiş yeni nesil web tabanlı bir CAD ve CBS (GIS) platformudur. 
+      Herhangi bir masaüstü yazılım kurulumu veya lisans gerektirmeden, Netcad'in ikili (.ncz) çizim dosyalarını tarayıcınız üzerinden anında açabilir, inceleyebilir ve düzenleyebilirsiniz.
+    </p>
+
+    <h2>Online Netcad NCZ Dosyası Açma ve Görüntüleme</h2>
+    <p>
+      Netcad NCZ dosya formatı, Türkiye'deki harita, kadastro ve imar projelerinde en yaygın kullanılan çizim formatıdır. 
+      EsoCAD yüksek performanslı ikili (binary) ayrıştırıcı motoru sayesinde megabaytlarca büyüklükteki NCZ dosyalarını saniyeler içinde açar. 
+      Poligonlar, kırık çizgiler (polyline), daireler, yaylar (arc), semboller, bloklar ve çizim yazıları Netcad standart renk ve tabaka hiyerarşisiyle eksiksiz olarak ekrana yansıtılır.
+    </p>
+
+    <h2>Resmi TKGM MEGSİS Canlı Kadastro Parsel Sorgulama</h2>
+    <p>
+      EsoCAD, Tapu ve Kadastro Genel Müdürlüğü (TKGM) MEGSİS servisleriyle canlı entegrasyona sahiptir. 
+      Sol taraftaki parsel sorgulama panelinden Türkiye genelindeki 81 il, ilçe ve mahalle hiyerarşisinde ada ve parsel numarasını girerek anlık parsel sorgulaması yapabilirsiniz.
+      Sorgulanan parselin tapu alanı, CAD hesaplanan yüzölçümü, çevre uzunluğu, niteliği, mevkii ve köşe koordinatları otomatik olarak listelenir ve harita üzerine çizilir.
+    </p>
+
+    <h2>Geodezik Projeksiyon Desteği (ITRF96 ve ED50)</h2>
+    <p>
+      EsoCAD; Türkiye geodezik standartlarına uygun ITRF96 (TM27, TM30, TM33, TM36) 3 derecelik dilim projeksiyonlarını, eski kadastro projeksiyonu olan ED50 TM dilimlerini ve WGS84 UTM 6 derecelik projeksiyon sistemlerini destekler. 
+      Çizim koordinatları otomatik olarak algılanır ve Google Uydu / Hibrit altlığı çiziminizin altına sıfır sapmayla oturtulur.
+    </p>
+
+    <h2>AutoCAD DXF, Google Earth KML ve Excel Koordinat Dönüştürme</h2>
+    <p>
+      EsoCAD içinde açtığınız NCZ çizimlerini veya sorguladığınız kadastro parsellerini tek tıkla:
+    </p>
+    <ul>
+      <li>AutoCAD R2000 LWPOLYLINE uyumlu <strong>DXF</strong> dosyasına dönüştürerek bilgisayarınıza indirebilirsiniz.</li>
+      <li>Google Earth uyumlu <strong>KML</strong> dosyası olarak kaydedip mobil veya masaüstü Google Earth uygulamasında açabilirsiniz.</li>
+      <li>Tüm köşe ve nirengi noktalarını <strong>Excel / CSV Koordinat Cetveli (Y-X-Z)</strong> olarak dışa aktarabilirsiniz.</li>
+    </ul>
+
+    <h2>Gelişmiş CAD Ölçüm ve Snap Yakalama Motoru</h2>
+    <p>
+      EsoCAD; köşe, orta nokta, kesişim, dik ayak ve en yakın nokta olmak üzere 5 farklı CAD snap (kenetleme) moduna sahiptir. 
+      İki nokta arası net mesafe, çoklu hat uzunluğu, poligon alanı ve çevre hesaplamalarını milimetrik Netcad koordinat hassasiyetinde yapabilirsiniz.
+    </p>
+  </article>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
