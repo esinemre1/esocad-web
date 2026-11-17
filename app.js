@@ -510,7 +510,7 @@ async function loadNCZFile(file) {
     updateSavedParcelsBadge();
 
     const hiddenCount = cad.hidden.size;
-    const hiddenMsg = (hiddenCount > 0) ? ` • ${hiddenCount} tabaka Netcad durumuna göre kapalı açıldı` : '';
+    const hiddenMsg = (hiddenCount > 0) ? ` • ${hiddenCount} tabaka varsayılan duruma göre kapalı açıldı` : '';
     const restoredMsg = (restoredCount > 0) ? ` • ${restoredCount} kayıtlı parsel eklendi` : '';
 
     // Auto-detect Turkish Geodetic Projection (ITRF 33, 30, 36, 27)
@@ -533,7 +533,7 @@ async function loadNCZFile(file) {
 
     const kb = (report.size / 1024).toFixed(0);
     const parseSec = ((t1 - t0) / 1000).toFixed(2);
-    fileInfo.textContent = `${file.name} (${kb} KB) • Netcad ${report.version} • ${report.entities.length.toLocaleString()} geometri (${parseSec}s)`;
+    fileInfo.textContent = `${file.name} (${kb} KB) • NCZ Sürüm: ${report.version} • ${report.entities.length.toLocaleString()} geometri (${parseSec}s)`;
     hudSelection.textContent = `Hazır • ${report.entities.length.toLocaleString()} geometri başarıyla yüklendi${projMsg}${hiddenMsg}`;
 
     const counts = {};
@@ -548,7 +548,7 @@ async function loadNCZFile(file) {
         <div><strong>Dosya Adı:</strong> ${file.name}</div>
         <div><strong>Dosya Boyutu:</strong> ${report.size.toLocaleString()} bayt (${kb} KB)</div>
         <div><strong>Çözümleme Süresi:</strong> ${parseSec} saniye</div>
-        <div><strong>Netcad Sürümü:</strong> ${report.version}</div>
+        <div><strong>NCZ Sürümü:</strong> ${report.version}</div>
         <div><strong>Toplam Tabaka:</strong> ${report.layers.length}</div>
         <div><strong>Toplam Geometri:</strong> ${report.entities.length.toLocaleString()}</div>
         <div style="margin-top: 10px;"><strong>Geometri Tipleri Dağılımı:</strong></div>
@@ -1131,19 +1131,19 @@ if (btnGotoCoord) {
     const desc = document.createElement('div');
     desc.style.color = '#8b949e';
     desc.style.fontSize = '12px';
-    desc.textContent = 'Gitmek istediğiniz Netcad koordinatlarını girin. Kamera yumuşak bir şekilde o noktaya uçacak ve radar reticle hedef işareti belirecektir.';
+    desc.textContent = 'Gitmek istediğiniz harita koordinatlarını girin. Kamera yumuşak bir şekilde o noktaya uçacak ve radar reticle hedef işareti belirecektir.';
     box.appendChild(desc);
 
     const yInp = document.createElement('input');
     yInp.type = 'number';
     yInp.step = 'any';
-    yInp.placeholder = 'Netcad Y (Sağa Değer / Easting ~500.000)';
+    yInp.placeholder = 'Y (Sağa Değer / Easting ~500.000)';
     yInp.style.cssText = 'padding: 8px 12px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 4px; font-family: monospace; font-size: 13px;';
 
     const xInp = document.createElement('input');
     xInp.type = 'number';
     xInp.step = 'any';
-    xInp.placeholder = 'Netcad X (Yukarı Değer / Northing ~4.200.000)';
+    xInp.placeholder = 'X (Yukarı Değer / Northing ~4.200.000)';
     xInp.style.cssText = yInp.style.cssText;
 
     // Eğer projede kayıtlı nokta veya daha önce seçilmiş nokta varsa varsayılan olarak yaz
@@ -1735,7 +1735,7 @@ if (btnResCopyCoords) {
     });
     navigator.clipboard.writeText(t).then(() => {
       hudSelection.textContent = `✓ ${poly.points.length} köşe koordinatı panoya kopyalandı!`;
-      setPanelStatus(`✓ ${poly.points.length} köşe koordinatı panoya kopyalandı (Netcad Y-X formatı)!`, 'success');
+      setPanelStatus(`✓ ${poly.points.length} köşe koordinatı panoya kopyalandı (Harita Y-X formatı)!`, 'success');
     });
   };
 }
@@ -1933,7 +1933,7 @@ function updateSavedParcelsBadge() {
   }
 }
 
-// Netcad / AutoCAD Uyumlu DXF Dosyası İndirme (ITRF LWPOLYLINE)
+// AutoCAD / CAD Uyumlu DXF Dosyası İndirme (ITRF LWPOLYLINE)
 function downloadParcelDxf(p) {
   if (!p || !p.geojsonData) return;
   const data = p.geojsonData;
@@ -1959,7 +1959,7 @@ function downloadParcelDxf(p) {
     } catch (e) {
       proj = [pt[0], pt[1]];
     }
-    // Netcad: X = Easting, Y = Northing
+    // CAD: X = Easting, Y = Northing
     dxf += ` 10\n${proj[0]}\n 20\n${proj[1]}\n`;
   });
 
@@ -2055,7 +2055,7 @@ function openSavedParcelsModal() {
     const btnDxf = document.createElement('button');
     btnDxf.className = 'sp-btn';
     btnDxf.innerHTML = '💾 DXF';
-    btnDxf.title = 'Netcad ve AutoCAD uyumlu ITRF DXF dosyası indir';
+    btnDxf.title = 'AutoCAD ve CAD uyumlu ITRF DXF dosyası indir';
     btnDxf.onclick = () => {
       downloadParcelDxf(p);
       hudSelection.textContent = `${p.adaNo}_${p.parselNo}.dxf indirildi`;
@@ -2283,7 +2283,7 @@ document.getElementById('btnPointManual').onclick = () => {
     hudSelection.textContent = `N${idx} • Y (Sağa): ${easting.toFixed(3)} • X (Yukarı): ${northing.toFixed(3)}`;
   };
 
-  showModal("Netcad Koordinattan Nokta Ekle (Y-X)", box, null, [btnCancel, btnAdd]);
+  showModal("Harita Koordinatından Nokta Ekle (Y-X)", box, null, [btnCancel, btnAdd]);
 };
 
 document.getElementById('btnPointList').onclick = () => {
@@ -2510,7 +2510,7 @@ window.addEventListener('click', (e) => {
   }
 });
 
-// Canlı Netcad Koordinat Gösterimi (Y: Easting / Sağa, X: Northing / Yukarı)
+// Canlı CAD Koordinat Gösterimi (Y: Easting / Sağa, X: Northing / Yukarı)
 const valCoordY = document.getElementById('valCoordY');
 const valCoordX = document.getElementById('valCoordX');
 

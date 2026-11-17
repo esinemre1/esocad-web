@@ -1,21 +1,21 @@
 # EsoCAD - Web CAD & GIS Platformu (JavaScript & Canvas / WebGL)
 
-Netcad NCZ ve CBS (GIS) ekosisteminin tüm yeteneklerini modern HTML5, CSS3 ve saf ES6+ JavaScript ile web ortamına taşıyan yüksek performanslı CAD & GIS platformu.
+NCZ ve CBS (GIS) ekosisteminin tüm yeteneklerini modern HTML5, CSS3 ve saf ES6+ JavaScript ile web ortamına taşıyan yüksek performanslı CAD & GIS platformu.
 
 ## Özellikler
 
 1. **NCZ Binary Parser (`NczScanner.js`)**:
-   - Little-Endian Netcad NCZ binary blok ayrıştırma motoru
+   - Little-Endian NCZ binary blok ayrıştırma motoru
    - Point, Line, Polyline, Polygon, Circle, Arc, Text, Symbol, Pafta ve Smart Object çözümleri
    - Türkçe karakter kodlama (ISO-8859-9 / Windows-1254) desteği
-   - Tabaka tablosu, Netcad varsayılan kapalı tabakaları (LEX.ST8 / LEX.ST2) ve tabaka renkleri
+   - Tabaka tablosu, Varsayılan kapalı tabakaları (LEX.ST8 / LEX.ST2) ve tabaka renkleri
 
 2. **2D CAD & Harita Motoru (`CadView.js`)**:
    - Pürüzsüz kamera animasyonları (`easeOutCubic`)
    - Görünüm Geçmişi (Zoom Önceki / Sonraki - `Ctrl+Z` / `Ctrl+Y`)
    - Hedef Radar Beacon Reticle ile Koordinata Uçuş
    - Kuşbakışı Navigasyon (Minimap)
-   - Dinamik Türkiye Netcad Pafta ve Metrik Ölçek Çubuğu (1/500, 1/1000, 1/5000 vb.)
+   - Dinamik Türkiye Standart Pafta ve Metrik Ölçek Çubuğu (1/500, 1/1000, 1/5000 vb.)
    - Orta fare tuşu (Wheel Click Drag Pan), Spacebar Hand Tool ve dokunmatik pinch-to-zoom
    - Akıllı Snap Motoru (Köşe, Orta, Kesişim, Dik, Yakın)
    - Parsel kenar uzunluklarını yazdırma & Köşe / Kenar / Semt (gon) tablosu

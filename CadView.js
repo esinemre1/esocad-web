@@ -161,7 +161,7 @@ export class CadView {
     this.layerVisibility = layerVisibility;
     this.hidden.clear();
 
-    // Respect default Netcad closed/hidden layer states
+    // Respect default closed/hidden layer states
     if (layerVisibility && layerVisibility.length > 0) {
       for (let i = 0; i < layers.length; i++) {
         if (layerVisibility[i] === false) {
@@ -1461,7 +1461,7 @@ export class CadView {
       : (this.layerColors ? this.layerColors[layer - 1] : null);
     let col = c || this.palette[Math.abs(layer) % this.palette.length];
 
-    // Netcad/AutoCAD Color 7 / Dinamik Kontrast Motoru:
+    // CAD/AutoCAD Color 7 / Dinamik Kontrast Motoru:
     // Koyu ekranda (#15181e) veya uyduda siyah/koyu kalemler görünmez -> CAD Beyazı (#f0f6fc) ve Parlak Mavi (#58a6ff)
     // Beyaz ekranda (#fbfcfd) beyaz çizgiler görünmez -> Koyu füme kalem (#161b22)
     if (col && typeof col === "string") {
@@ -1502,8 +1502,8 @@ export class CadView {
   }
 
   _doNavUpdate() {
-    const x = this.lastWorldX; // Easting (Netcad Y: Sağa Değer)
-    const y = this.lastWorldY; // Northing (Netcad X: Yukarı Değer)
+    const x = this.lastWorldX; // Easting (CAD Y: Sağa Değer)
+    const y = this.lastWorldY; // Northing (CAD X: Yukarı Değer)
     let wgs = null;
     if (x !== null && y !== null && this.projection !== "NONE") {
       wgs = this.toWgs84(x, y);
@@ -1678,8 +1678,8 @@ export class CadView {
 
   detectProjection() {
     if (this.entities.length === 0) return null;
-    const cx = (this.minX + this.maxX) / 2.0; // Easting (Netcad Y)
-    const cy = (this.minY + this.maxY) / 2.0; // Northing (Netcad X)
+    const cx = (this.minX + this.maxX) / 2.0; // Easting (CAD Y)
+    const cy = (this.minY + this.maxY) / 2.0; // Northing (CAD X)
 
     // Check Turkey bounding box (Northing: 3.9M - 4.7M, Easting: 200k - 800k)
     if (cy >= 3900000 && cy <= 4700000 && cx >= 200000 && cx <= 800000) {
@@ -1738,14 +1738,14 @@ export class CadView {
     }
   }
 
-  // Convert Netcad Easting (X) and Northing (Y) to WGS84 (lon, lat) using Proj4
+  // Convert CAD Easting (X) and Northing (Y) to WGS84 (lon, lat) using Proj4
   toWgs84(worldX, worldY) {
     if (typeof window.proj4 === 'undefined' || this.projection === "NONE") return null;
     this.ensureProjDefs();
     const srcEpsg = this.getProjEpsg();
 
     try {
-      // Netcad coords: worldX = Easting (~500,000), worldY = Northing (~4,200,000)
+      // CAD coords: worldX = Easting (~500,000), worldY = Northing (~4,200,000)
       const res = window.proj4(srcEpsg, 'EPSG:4326', [worldX, worldY]);
       if (isNaN(res[0]) || isNaN(res[1])) return null;
       return { lon: res[0], lat: res[1] };
@@ -1754,7 +1754,7 @@ export class CadView {
     }
   }
 
-  // Convert WGS84 back to Netcad coordinates
+  // Convert WGS84 back to CAD coordinates
   fromWgs84(lon, lat) {
     if (typeof window.proj4 === 'undefined' || this.projection === "NONE") return null;
     this.ensureProjDefs();
@@ -2012,7 +2012,7 @@ export class CadView {
     const polygons = this.entities.filter(e => e.kind === "Polygon" && e.points && e.points.length >= 3);
     const points = this.entities.filter(e => (e.kind === "Point" || (e.points && e.points.length === 1)));
 
-    let kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>Netcad_Proje_KML</name>\n`;
+    let kml = `<?xml version="1.0" encoding="UTF-8"?>\n<kml xmlns="http://www.opengis.net/kml/2.2">\n  <Document>\n    <name>EsoCAD_Proje_KML</name>\n`;
     kml += `    <Style id="polyStyle"><LineStyle><color>ff00ffff</color><width>2</width></LineStyle><PolyStyle><color>4d00ffff</color></PolyStyle></Style>\n`;
     kml += `    <Folder><name>Parseller (Alanlar)</name>\n`;
 
@@ -2124,7 +2124,7 @@ export class CadView {
     this.ensureProjDefs();
     const projEpsg = this.getProjEpsg() || 'EPSG:7935';
 
-    // WGS84 (Lon, Lat) -> CAD Koordinatlarına Dönüştür (Netcad: Y = Easting, X = Northing)
+    // WGS84 (Lon, Lat) -> CAD Koordinatlarına Dönüştür (CAD: Y = Easting, X = Northing)
     const cadPoints = [];
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     let sumX = 0, sumY = 0;
@@ -2392,7 +2392,7 @@ export class CadView {
 
             const isLight = (this.theme === "light" && !this.satelliteEnabled);
             if (e.text && e.text.trim()) {
-              // Netcad Parsel Numarası (Üstte) + Alan Bilgisi (Altta)
+              // Parsel Numarası (Üstte) + Alan Bilgisi (Altta)
               ctx.font = "bold 12px 'Segoe UI', Arial, sans-serif";
               ctx.strokeStyle = isLight ? "rgba(255, 255, 255, 0.95)" : "rgba(0, 0, 0, 0.92)";
               ctx.lineWidth = 3.0;
@@ -2554,7 +2554,7 @@ export class CadView {
             const x = this.sx(p.x, p.y);
             const y = this.sy(p.x, p.y);
 
-            // Professional Netcad Survey Point Marker
+            // Professional CAD Survey Point Marker
             ctx.beginPath();
             ctx.arc(x, y, this.showPoints ? 5 : 3.5, 0, Math.PI * 2);
             ctx.strokeStyle = strokeColor;
@@ -2656,7 +2656,7 @@ export class CadView {
       }
     }
 
-    // Render Point Names / Numbers (Nokta Adları - Yüksek Kontrastlı Netcad Rozeti)
+    // Render Point Names / Numbers (Nokta Adları - Yüksek Kontrastlı CAD Rozeti)
     if (this.showPointNames && pointNamesToDraw.length > 0) {
       const isLight = (this.theme === "light" && !this.satelliteEnabled);
       const scale = this.textScale || 1.0;
@@ -2983,7 +2983,7 @@ export class CadView {
     const y = this.height - 25;
     const x = 20;
 
-    // Standart Türk Netcad Pafta Ölçeği Tahmini (1 px ≈ 0.264 mm)
+    // Standart Türk Standart Pafta Ölçeği Tahmini (1 px ≈ 0.264 mm)
     const rawScale = metersPerPx / 0.000264583;
     const standardScales = [100, 200, 500, 1000, 2000, 5000, 10000, 25000, 50000, 100000];
     let bestScale = standardScales[0];
@@ -3007,12 +3007,12 @@ export class CadView {
     ctx.fill();
     ctx.stroke();
 
-    // Netcad Pafta Ölçeği Metni
+    // Standart Pafta Ölçeği Metni
     ctx.fillStyle = isLight ? "#ea580c" : "#58a6ff";
     ctx.font = "bold 11px -apple-system, monospace";
     ctx.fillText(`ÖLÇEK: 1/${bestScale.toLocaleString()}`, x, y - 14);
 
-    // Çift Bölmeli Metrik Bar (Netcad Pafta Formatı)
+    // Çift Bölmeli Metrik Bar (Standart Pafta Formatı)
     const halfPx = px / 2;
     ctx.fillStyle = isLight ? "#ea580c" : "#ffffff";
     ctx.fillRect(x, y - 6, halfPx, 5);

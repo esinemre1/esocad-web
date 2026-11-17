@@ -1,7 +1,7 @@
 {
-  "name": "EsoCAD - Web Netcad NCZ Görüntüleyici & TKGM Parsel Sorgulama",
+  "name": "EsoCAD - Web NCZ Görüntüleyici & CAD Platformu & TKGM Parsel Sorgulama",
   "short_name": "EsoCAD",
-  "description": "Netcad NCZ dosyalarını tarayıcınızda açın, TKGM MEGSİS ile canlı parsel sorgulayın, AutoCAD DXF formatına dönüştürün.",
+  "description": "NCZ dosyalarını tarayıcınızda açın, TKGM MEGSİS ile canlı parsel sorgulayın, AutoCAD DXF formatına dönüştürün.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
