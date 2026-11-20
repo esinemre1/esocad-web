@@ -282,6 +282,10 @@
             <span class="menu-label">Köşe - Kenar - Semt Cetveli Tablosu</span>
           </div>
           <div class="menu-sep"></div>
+          <div class="menu-action highlight" id="btnOpenSetbackTool">
+            <span class="menu-label">📐 İmar Çekme Mesafesi (Bina Oturumu)...</span>
+            <span class="menu-tag" style="background:#ea580c;">İMAR</span>
+          </div>
           <div class="menu-action" id="btnParcelLabels">
             <span class="menu-label">Tüm Kenar Boylarını Çizime Yazdır</span>
           </div>
@@ -531,6 +535,7 @@
         </div>
       </div>
       <div class="entity-info-footer">
+        <button class="ent-btn" id="btnEntSetback" title="Bu poligon/parsel için imar çekme mesafesi uygula" style="display:none; color:#ea580c; font-weight:700;">📐 Çekme</button>
         <button class="ent-btn" id="btnEntZoom" title="Bu objeye odaklan">🎯 Odaklan</button>
         <button class="ent-btn" id="btnEntCopy" title="Bilgileri kopyala">📋 Kopyala</button>
         <button class="ent-btn" id="btnEntLayerSolo" title="Bu tabakayı izole et">👁️ İzole Et</button>
@@ -674,6 +679,9 @@
 
           <!-- Alt Butonlar -->
           <div class="result-bottom-actions">
+            <button class="parcel-btn primary" id="btnResOpenSetback" style="background:#ea580c; border-color:#ea580c; color:#fff;" title="Yoldan ve komşudan çekme mesafesi uygulayarak yapı oturum alanını hesapla">
+              📐 İmar Çekme Mesafesi (Bina Oturumu)
+            </button>
             <button class="parcel-btn outline" id="btnResExportDxf">
               📥 Parseli DXF Olarak İndir
             </button>
@@ -862,6 +870,107 @@
       <div class="modal-body" id="modalBody"></div>
       <div class="modal-footer" id="modalFooter">
         <button class="modal-btn primary" id="btnModalOk">TAMAM</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- İmar Çekme Mesafesi & Yapı Yaklaşma Sınırı Modalı -->
+  <div class="modal-overlay" id="setbackModal" style="display:none;">
+    <div class="setback-modal-window">
+      <div class="setback-modal-header">
+        <div class="setback-modal-title">
+          <span style="font-size:18px;">📐</span>
+          <h3>İmar Çekme Mesafesi & Yapı Yaklaşma Sınırı</h3>
+        </div>
+        <button class="close-panel-btn" id="btnSetbackClose" title="Kapat (Esc)">✕</button>
+      </div>
+
+      <div class="setback-modal-body">
+        <!-- Hızlı Ön Ayarlar -->
+        <div class="setback-preset-bar">
+          <div class="setback-preset-group">
+            <label>Ön Bahçe (Yol):</label>
+            <div class="setback-input-unit">
+              <input type="number" id="inpSetbackRoadDefault" value="5.0" min="0" max="100" step="0.5">
+              <span>m</span>
+            </div>
+          </div>
+          <div class="setback-preset-group">
+            <label>Yan Bahçe (Komşu):</label>
+            <div class="setback-input-unit">
+              <input type="number" id="inpSetbackSideDefault" value="3.0" min="0" max="100" step="0.5">
+              <span>m</span>
+            </div>
+          </div>
+          <div class="setback-preset-group">
+            <label>Arka Bahçe:</label>
+            <div class="setback-input-unit">
+              <input type="number" id="inpSetbackRearDefault" value="3.0" min="0" max="100" step="0.5">
+              <span>m</span>
+            </div>
+          </div>
+          <div class="setback-preset-actions">
+            <button class="setback-mini-btn" id="btnApplyAllSide" title="Tüm kenarları 3m Komşu Çekmesi Yap">🏠 Tümü Komşu (3m)</button>
+            <button class="setback-mini-btn" id="btnApplyStandard" title="En uzun cepheyi 5m Yol, diğerlerini 3m Komşu Yap">🚗 Standart İmar (5m Yol / 3m Komşu)</button>
+          </div>
+        </div>
+
+        <!-- Kenar Bazlı Çekme Mesafeleri Tablosu -->
+        <div class="setback-edges-section">
+          <div class="setback-section-title">
+            <span>PARSEL CEPHELERİ & ÇEKME MESAFELERİ</span>
+            <span class="setback-badge" id="setbackEdgeCountBadge">0 Kenar</span>
+          </div>
+          <div class="setback-edges-table-wrap">
+            <table class="setback-edges-table">
+              <thead>
+                <tr>
+                  <th style="width:36px;">No</th>
+                  <th>Köşeler</th>
+                  <th>Kenar Boyu</th>
+                  <th>Cephe Türü</th>
+                  <th style="width:110px;">Çekme (m)</th>
+                </tr>
+              </thead>
+              <tbody id="setbackEdgesTableBody">
+                <!-- Dinamik JavaScript ile doldurulur -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Canlı İmar & İnşaat Taban Alanı (TAKS) Özeti -->
+        <div class="setback-summary-card" id="setbackSummaryCard">
+          <div class="setback-summary-grid">
+            <div class="sum-item">
+              <span class="sum-lbl">Parsel Alanı:</span>
+              <span class="sum-val" id="sbOrigAreaText">0.00 m²</span>
+            </div>
+            <div class="sum-item highlight">
+              <span class="sum-lbl">Yapı Taban Alanı:</span>
+              <span class="sum-val bold text-rose" id="sbNewAreaText">0.00 m²</span>
+            </div>
+            <div class="sum-item">
+              <span class="sum-lbl">TAKS (Oturum Oranı):</span>
+              <span class="sum-val bold text-amber" id="sbTaksText">%0.0</span>
+            </div>
+            <div class="sum-item">
+              <span class="sum-lbl">Açık Bahçe Alanı:</span>
+              <span class="sum-val" id="sbGardenAreaText">0.00 m²</span>
+            </div>
+            <div class="sum-item">
+              <span class="sum-lbl">Bina Taban Çevresi:</span>
+              <span class="sum-val" id="sbPerimeterText">0.00 m</span>
+            </div>
+          </div>
+          <div id="setbackStatusMsg" class="setback-status-msg" style="display:none;"></div>
+        </div>
+      </div>
+
+      <div class="setback-modal-footer">
+        <button class="modal-btn secondary" id="btnSetbackCancel">Vazgeç</button>
+        <button class="modal-btn outline" id="btnSetbackExportDxf">📥 DXF İndir</button>
+        <button class="modal-btn primary" id="btnSetbackCommit" style="background:#ea580c; border-color:#ea580c;">💾 Çizime Ekle & Kaydet</button>
       </div>
     </div>
   </div>

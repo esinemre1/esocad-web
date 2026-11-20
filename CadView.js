@@ -101,6 +101,7 @@ export class CadView {
     this.snapHit = null;
     this.draggedMeasureGrip = null; // { type: 'vertex'|'midpoint', index: number }
     this.hoverMeasureGrip = null; // Fare altındaki tutamaç
+    this.setbackPreview = null; // İmar Çekme Mesafesi Canlı Önizleme Nesnesi
 
     this.zoomWindow = false;
     this.zoomWindowStart = null;
@@ -1274,6 +1275,151 @@ export class CadView {
 
   calcPerimeter(pts) {
     return this.calcLength(pts, true);
+  }
+
+  // İmar Çekme Mesafesi / İç Ofset (Yapı Yaklaşma Sınırı) Hesaplama Motoru
+  computePolygonSetback(points, distances) {
+    if (!points || points.length < 3) return null;
+    const n = points.length;
+
+    // 1. Alan yönünü (Orientation) belirle (Shoelace formülü)
+    let signedArea = 0;
+    for (let i = 0; i < n; i++) {
+      const a = points[i];
+      const b = points[(i + 1) % n];
+      signedArea += (a.x * b.y - b.x * a.y);
+    }
+    const isCCW = (signedArea > 0);
+
+    // 2. Her kenar için içe ötelenmiş doğru denklemini (A*x + B*y + C = 0) kur
+    const lines = [];
+    for (let i = 0; i < n; i++) {
+      const p1 = points[i];
+      const p2 = points[(i + 1) % n];
+      const dx = p2.x - p1.x;
+      const dy = p2.y - p1.y;
+      const len = Math.hypot(dx, dy);
+      if (len < 1e-6) continue;
+
+      const ux = dx / len;
+      const uy = dy / len;
+
+      // İçeri bakan birim normal vektör (Inward unit normal)
+      const nx = isCCW ? -uy : uy;
+      const ny = isCCW ? ux : -ux;
+
+      const dist = (Array.isArray(distances) ? (distances[i] !== undefined ? distances[i] : 3.0) : (distances || 3.0));
+
+      // Ötelenmiş doğru üzerindeki bir nokta
+      const ox = p1.x + nx * dist;
+      const oy = p1.y + ny * dist;
+
+      // Doğru denklemi: Ax + By + C = 0
+      const A = nx;
+      const B = ny;
+      const C = -(nx * ox + ny * oy);
+
+      lines.push({ A, B, C, dist, p1, p2, nx, ny, len });
+    }
+
+    if (lines.length < 3) return null;
+
+    // 3. Ardışık doğruların kesişim noktalarını (yeni iç köşeleri) hesapla
+    const newPoints = [];
+    const numLines = lines.length;
+    for (let i = 0; i < numLines; i++) {
+      const L1 = lines[(i - 1 + numLines) % numLines];
+      const L2 = lines[i];
+
+      const det = L1.A * L2.B - L1.B * L2.A;
+      if (Math.abs(det) < 1e-7) {
+        newPoints.push({
+          x: (L1.p2.x + L2.p1.x) / 2,
+          y: (L1.p2.y + L2.p1.y) / 2
+        });
+      } else {
+        const ix = (L1.B * L2.C - L2.B * L1.C) / det;
+        const iy = (L2.A * L1.C - L1.A * L2.C) / det;
+        newPoints.push({ x: ix, y: iy });
+      }
+    }
+
+    // 4. Doğrulama: Yeni poligonun alanı pozitif ve orijinal alandan küçük olmalı
+    let newSignedArea = 0;
+    for (let i = 0; i < newPoints.length; i++) {
+      const a = newPoints[i];
+      const b = newPoints[(i + 1) % newPoints.length];
+      newSignedArea += (a.x * b.y - b.x * a.y);
+    }
+
+    const newIsCCW = (newSignedArea > 0);
+    const newArea = Math.abs(newSignedArea) / 2.0;
+    const origArea = Math.abs(signedArea) / 2.0;
+
+    if (newArea >= origArea || (newSignedArea !== 0 && newIsCCW !== isCCW) || newArea < 1.0) {
+      return {
+        success: false,
+        error: "Girilen çekme mesafeleri parsel boyutunu aşıyor! Parsel içine bina oturumu sığmıyor.",
+        origArea,
+        newArea: 0,
+        taks: 0,
+        perimeter: 0,
+        points: [],
+        lines
+      };
+    }
+
+    return {
+      success: true,
+      origArea,
+      newArea,
+      taks: (newArea / origArea) * 100,
+      perimeter: this.calcLength(newPoints, true),
+      points: newPoints,
+      lines
+    };
+  }
+
+  // İmar Çekme Önizlemesini Ayarla / Güncelle
+  setSetbackPreview(previewData) {
+    this.setbackPreview = previewData;
+    this.requestRender();
+  }
+
+  // İmar Çekme Önizlemesini Temizle
+  clearSetbackPreview() {
+    this.setbackPreview = null;
+    this.requestRender();
+  }
+
+  // Hesaplanan Yapı Oturum Alanını Çizime Yeni Bir Tabaka Olarak Kaydet
+  commitSetbackAsEntity(setbackData, layerName = "YAPI_YAKLASMA") {
+    if (!setbackData || !setbackData.points || setbackData.points.length < 3) return null;
+
+    // Tabakayı bul veya oluştur
+    let layerIdx = this.layers.indexOf(layerName);
+    if (layerIdx === -1) {
+      layerIdx = this.addNewLayer(layerName, "#e11d48"); // CAD yapı yaklaşma rengi
+    }
+
+    const newEntity = {
+      kind: "Polygon",
+      layer: layerIdx,
+      points: setbackData.points.map(p => ({ x: p.x, y: p.y })),
+      meta: {
+        isSetback: true,
+        origArea: setbackData.origArea,
+        newArea: setbackData.newArea,
+        taks: setbackData.taks,
+        createdDate: new Date().toISOString()
+      }
+    };
+
+    this.entities.push(newEntity);
+    this.rebuildSpatialGrid();
+    this.requestRender();
+
+    return newEntity;
   }
 
   segmentDistance(px, py, ax, ay, bx, by) {
@@ -2879,6 +3025,9 @@ export class CadView {
     // Aktif Ölçüm Çizgileri ve Canlı Rozetler (Distance, Polyline, Free Area, Angle, Perpendicular)
     this.drawActiveMeasurements(ctx);
 
+    // İmar Çekme Mesafesi ve Yapı Yaklaşma Sınırı Canlı Önizlemesi
+    this.drawSetbackPreview(ctx);
+
     this.drawScaleBar(ctx);
 
     // Kuşbakışı Minimap güncelle (Throttled: Sürükleme anında render kasmalarını önler)
@@ -2889,6 +3038,162 @@ export class CadView {
         this.drawMinimap();
       }
     }
+  }
+
+  // İmar Çekme Mesafesi ve Yapı Yaklaşma Sınırı Canlı Çizimi
+  drawSetbackPreview(ctx) {
+    if (!this.setbackPreview) return;
+    const sp = this.setbackPreview;
+    if (!sp.points || sp.points.length < 3) return;
+
+    ctx.save();
+
+    // 1. Orijinal Parsel Kenarlarını Çekme Türüne Göre Renkli Vurgula
+    if (sp.origPoints && sp.edgeTypes) {
+      const origPts = sp.origPoints;
+      for (let i = 0; i < origPts.length; i++) {
+        const a = origPts[i];
+        const b = origPts[(i + 1) % origPts.length];
+        const type = (sp.edgeTypes && sp.edgeTypes[i]) ? sp.edgeTypes[i] : 'komsu';
+        const dist = (sp.distances && sp.distances[i] !== undefined) ? sp.distances[i] : 3.0;
+
+        const isRoad = (type === 'yol' || type === 'on');
+        ctx.strokeStyle = isRoad ? "#0284c7" : "#f59e0b"; // Mavi (Yol) veya Kehribar (Komşu)
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(this.sx(a.x, a.y), this.sy(a.y, a.y));
+        ctx.lineTo(this.sx(b.x, b.y), this.sy(b.y, b.y));
+        ctx.stroke();
+
+        // Kenar Orta Noktasına Çekme Türü ve Mesafe Rozeti
+        const mx = this.sx((a.x + b.x) / 2, (a.y + b.y) / 2);
+        const my = this.sy((a.x + b.x) / 2, (a.y + b.y) / 2);
+        const label = `${isRoad ? '🚗 YOL' : '🏠 KOMŞU'}: ${dist.toFixed(2)}m`;
+
+        ctx.font = "bold 10px 'Segoe UI', Arial, sans-serif";
+        const tm = ctx.measureText(label);
+        const tw = tm.width + 10;
+        ctx.fillStyle = isRoad ? "rgba(2, 132, 199, 0.92)" : "rgba(217, 119, 6, 0.92)";
+        ctx.fillRect(mx - tw / 2, my - 10, tw, 20);
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(mx - tw / 2, my - 10, tw, 20);
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(label, mx, my);
+      }
+    }
+
+    // 2. Yapı Yaklaşma Sınırı (Oturum Poligonu)
+    const pts = sp.points;
+    ctx.beginPath();
+    ctx.moveTo(this.sx(pts[0].x, pts[0].y), this.sy(pts[0].x, pts[0].y));
+    for (let i = 1; i < pts.length; i++) {
+      ctx.lineTo(this.sx(pts[i].x, pts[i].y), this.sy(pts[i].x, pts[i].y));
+    }
+    ctx.closePath();
+
+    // Bina Tabanı Yarı Saydam Gül Kırmızısı Dolgu
+    ctx.fillStyle = "rgba(225, 29, 72, 0.22)";
+    ctx.fill();
+
+    // Kesikli Yapı Yaklaşma Konturu (İmar Standardı)
+    ctx.strokeStyle = "#e11d48";
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([8, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Köşe Noktaları (Yapı Köşeleri)
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const sx = this.sx(p.x, p.y);
+      const sy = this.sy(p.x, p.y);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#e11d48";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.font = "bold 9px monospace";
+      ctx.fillStyle = "#e11d48";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(`B${i + 1}`, sx, sy - 6);
+    }
+
+    // Kenar Boyları (Bina Cephe Ölçüleri)
+    for (let i = 0; i < pts.length; i++) {
+      const a = pts[i];
+      const b = pts[(i + 1) % pts.length];
+      const d = Math.hypot(b.x - a.x, b.y - a.y);
+      const ax = this.sx(a.x, a.y);
+      const ay = this.sy(a.y, a.y);
+      const bx = this.sx(b.x, b.y);
+      const by = this.sy(b.y, b.y);
+      const mx = (ax + bx) / 2.0;
+      const my = (ay + by) / 2.0;
+      const angle = Math.atan2(by - ay, bx - ax);
+      if (d > 0.05) {
+        this.drawEdgeLabelBadge(ctx, mx, my, d, angle, -14);
+      }
+    }
+
+    // 3. Merkezde Bina Taban Alanı & TAKS Rozeti
+    if (pts.length >= 3) {
+      let cx = 0, cy = 0;
+      pts.forEach(p => { cx += p.x; cy += p.y; });
+      cx /= pts.length;
+      cy /= pts.length;
+
+      const scx = this.sx(cx, cy);
+      const scy = this.sy(cx, cy);
+
+      const title = "🏗️ YAPI TABAN ALANI";
+      const line1 = `TABAN ALANI: ${sp.newArea.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+      const line2 = `TAKS: %${sp.taks.toFixed(1)} • ÇEVRE: ${sp.perimeter.toFixed(2)} m`;
+
+      ctx.font = "bold 11px 'Segoe UI', Arial, sans-serif";
+      const w0 = ctx.measureText(title).width;
+      ctx.font = "bold 12px monospace";
+      const w1 = ctx.measureText(line1).width;
+      ctx.font = "10.5px monospace";
+      const w2 = ctx.measureText(line2).width;
+
+      const boxW = Math.max(w0, w1, w2) + 24;
+      const boxH = 56;
+      const boxX = scx - boxW / 2;
+      const boxY = scy - boxH / 2;
+
+      ctx.fillStyle = "rgba(15, 23, 42, 0.94)";
+      ctx.fillRect(boxX, boxY, boxW, boxH);
+      ctx.strokeStyle = "#e11d48";
+      ctx.lineWidth = 1.6;
+      ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+      // Üst Başlık
+      ctx.font = "bold 10px 'Segoe UI', Arial, sans-serif";
+      ctx.fillStyle = "#fb7185";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(title, scx, boxY + 12);
+
+      // Alan Satırı
+      ctx.font = "bold 12px monospace";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(line1, scx, boxY + 28);
+
+      // TAKS Satırı
+      ctx.font = "10.5px monospace";
+      ctx.fillStyle = "#facc15"; // Sarı altın vurgusu
+      ctx.fillText(line2, scx, boxY + 44);
+    }
+
+    ctx.restore();
   }
 
   drawBeacon(ctx) {

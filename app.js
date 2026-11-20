@@ -113,11 +113,19 @@ function updateEntityInfoBox(s) {
   if (!s) {
     entityInfoBox.classList.add('hidden');
     currentSelectedInfo = null;
+    const btnEntSetback = document.getElementById('btnEntSetback');
+    if (btnEntSetback) btnEntSetback.style.display = 'none';
     return;
   }
 
   currentSelectedInfo = s;
   entityInfoBox.classList.remove('hidden');
+
+  const btnEntSetback = document.getElementById('btnEntSetback');
+  if (btnEntSetback) {
+    const isPoly = (s.kind === "Polygon" || (s.entity && s.entity.points && s.entity.points.length >= 3) || (s.pointsCount >= 3));
+    btnEntSetback.style.display = isPoly ? 'block' : 'none';
+  }
 
   if (entInfoColor) entInfoColor.style.backgroundColor = s.layerColor || cad.color(s.layer);
   if (entInfoLayer) entInfoLayer.textContent = `${s.layerName} [No: ${s.layer}]`;
@@ -2831,3 +2839,436 @@ setTimeout(() => {
 
   showModal("SİSTEM BİLGİLENDİRMESİ", alertBox);
 }, 300);
+
+// ========================================================
+// İmar Çekme Mesafesi & Yapı Yaklaşma Sınırı (TAKS) Motoru
+// ========================================================
+(function initSetbackController() {
+  const setbackModal = document.getElementById('setbackModal');
+  if (!setbackModal) return;
+
+  const btnSetbackClose = document.getElementById('btnSetbackClose');
+  const btnSetbackCancel = document.getElementById('btnSetbackCancel');
+  const btnSetbackCommit = document.getElementById('btnSetbackCommit');
+  const btnSetbackExportDxf = document.getElementById('btnSetbackExportDxf');
+
+  const inpSetbackRoadDefault = document.getElementById('inpSetbackRoadDefault');
+  const inpSetbackSideDefault = document.getElementById('inpSetbackSideDefault');
+  const inpSetbackRearDefault = document.getElementById('inpSetbackRearDefault');
+  const btnApplyAllSide = document.getElementById('btnApplyAllSide');
+  const btnApplyStandard = document.getElementById('btnApplyStandard');
+
+  const setbackEdgesTableBody = document.getElementById('setbackEdgesTableBody');
+  const setbackEdgeCountBadge = document.getElementById('setbackEdgeCountBadge');
+
+  const sbOrigAreaText = document.getElementById('sbOrigAreaText');
+  const sbNewAreaText = document.getElementById('sbNewAreaText');
+  const sbTaksText = document.getElementById('sbTaksText');
+  const sbGardenAreaText = document.getElementById('sbGardenAreaText');
+  const sbPerimeterText = document.getElementById('sbPerimeterText');
+  const setbackStatusMsg = document.getElementById('setbackStatusMsg');
+
+  const btnOpenSetbackTool = document.getElementById('btnOpenSetbackTool');
+  const btnResOpenSetback = document.getElementById('btnResOpenSetback');
+  const btnEntSetback = document.getElementById('btnEntSetback');
+
+  let currentPolyPoints = null;
+  let currentEdges = [];
+  let currentResult = null;
+
+  function getRoadDefault() {
+    return Math.max(0, parseFloat(inpSetbackRoadDefault ? inpSetbackRoadDefault.value : 5.0) || 5.0);
+  }
+  function getSideDefault() {
+    return Math.max(0, parseFloat(inpSetbackSideDefault ? inpSetbackSideDefault.value : 3.0) || 3.0);
+  }
+  function getRearDefault() {
+    return Math.max(0, parseFloat(inpSetbackRearDefault ? inpSetbackRearDefault.value : 3.0) || 3.0);
+  }
+
+  function findTargetPolygon() {
+    // 1. Seçili obje poligon mu?
+    if (cad.selectedEntity && cad.selectedEntity.points && cad.selectedEntity.points.length >= 3) {
+      return cad.selectedEntity.points;
+    }
+    // 2. Tıklanıp bilgi paneline gelen obje
+    if (currentSelectedInfo && currentSelectedInfo.entity && currentSelectedInfo.entity.points && currentSelectedInfo.entity.points.length >= 3) {
+      return currentSelectedInfo.entity.points;
+    }
+    // 3. Aktif sorgulanan TKGM parseli varsa
+    if (typeof activeCurrentParcel !== 'undefined' && activeCurrentParcel && cad.entities) {
+      const tkgmPoly = cad.entities.find(e => (e.tkgmId === activeCurrentParcel.id || e.id === activeCurrentParcel.id) && (e.kind === "Polygon" || e.points));
+      if (tkgmPoly && tkgmPoly.points && tkgmPoly.points.length >= 3) {
+        return tkgmPoly.points;
+      }
+    }
+    // 4. Çizim tabakalarındaki PARSEL veya genel entities içindeki poligon
+    if (cad.entities && cad.entities.length > 0) {
+      for (let i = cad.entities.length - 1; i >= 0; i--) {
+        const ent = cad.entities[i];
+        if (ent && (ent.kind === "Polygon" || ent.isPolygon) && ent.points && ent.points.length >= 3) {
+          return ent.points;
+        }
+      }
+    }
+    // 5. Layers içindeki poligonlar
+    if (cad.layers && cad.layers.length > 0) {
+      for (let l = cad.layers.length - 1; l >= 0; l--) {
+        const layer = cad.layers[l];
+        if (layer && layer.polygons && layer.polygons.length > 0) {
+          return layer.polygons[layer.polygons.length - 1].points;
+        }
+      }
+    }
+    return null;
+  }
+
+  function openSetbackModal(points) {
+    if (!points || points.length < 3) {
+      points = findTargetPolygon();
+    }
+    if (!points || points.length < 3) {
+      alert("İmar çekme mesafesi hesaplamak için lütfen önce bir parsel/poligon seçin veya TKGM Parsel Sorgulama ile parsel yükleyin.");
+      return;
+    }
+
+    // Noktaları temiz kopyala
+    let cleanPoints = points.map(p => ({ x: Number(p.x), y: Number(p.y) }));
+    if (cleanPoints.length > 3) {
+      const first = cleanPoints[0];
+      const last = cleanPoints[cleanPoints.length - 1];
+      if (Math.hypot(first.x - last.x, first.y - last.y) < 1e-4) {
+        cleanPoints.pop();
+      }
+    }
+    if (cleanPoints.length < 3) {
+      alert("Seçilen obje geçerli bir poligon alanı oluşturmuyor.");
+      return;
+    }
+
+    currentPolyPoints = cleanPoints;
+    const n = currentPolyPoints.length;
+
+    // Kenarları oluştur
+    currentEdges = [];
+    const roadDef = getRoadDefault();
+    const sideDef = getSideDefault();
+
+    for (let i = 0; i < n; i++) {
+      const p1 = currentPolyPoints[i];
+      const p2 = currentPolyPoints[(i + 1) % n];
+      const len = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+      // İlk kenarı varsayılan Yol (Ön bahçe), diğerlerini Komşu (Yan bahçe) yap
+      const defaultType = (i === 0) ? 'road' : 'side';
+      const defaultDist = (i === 0) ? roadDef : sideDef;
+      currentEdges.push({
+        index: i,
+        p1,
+        p2,
+        length: len,
+        type: defaultType,
+        distance: defaultDist
+      });
+    }
+
+    if (setbackEdgeCountBadge) setbackEdgeCountBadge.textContent = `${n} Kenar / Cephe`;
+    renderEdgesTable();
+    recalcSetback();
+
+    setbackModal.style.display = 'flex';
+  }
+
+  function closeSetbackModal() {
+    setbackModal.style.display = 'none';
+    cad.clearSetbackPreview();
+  }
+
+  function renderEdgesTable() {
+    if (!setbackEdgesTableBody) return;
+    setbackEdgesTableBody.innerHTML = '';
+    const n = currentEdges.length;
+
+    currentEdges.forEach((edge, idx) => {
+      const tr = document.createElement('tr');
+
+      // Kenar No
+      const tdIdx = document.createElement('td');
+      tdIdx.style.textAlign = 'center';
+      tdIdx.innerHTML = `<span class="edge-num-badge">P${idx + 1} - P${((idx + 1) % n) + 1}</span>`;
+
+      // Kenar Uzunluğu
+      const tdLen = document.createElement('td');
+      tdLen.style.fontWeight = '600';
+      tdLen.textContent = `${edge.length.toFixed(2)} m`;
+
+      // Cephe Türü Seçimi
+      const tdType = document.createElement('td');
+      const select = document.createElement('select');
+      select.className = 'setback-edge-select';
+      select.innerHTML = `
+        <option value="road" ${edge.type === 'road' ? 'selected' : ''}>🛣️ Ön Bahçe (Yol)</option>
+        <option value="side" ${edge.type === 'side' ? 'selected' : ''}>🏡 Yan Bahçe (Komşu)</option>
+        <option value="rear" ${edge.type === 'rear' ? 'selected' : ''}>🌳 Arka Bahçe</option>
+        <option value="custom" ${edge.type === 'custom' ? 'selected' : ''}>⚙️ Özel Mesafe</option>
+      `;
+
+      // Çekme Mesafesi Girişi
+      const tdDist = document.createElement('td');
+      const distWrap = document.createElement('div');
+      distWrap.className = 'setback-input-unit';
+      distWrap.style.width = '100px';
+
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.min = '0';
+      input.max = '200';
+      input.step = '0.5';
+      input.value = edge.distance.toFixed(1);
+
+      const spanM = document.createElement('span');
+      spanM.textContent = 'm';
+
+      distWrap.appendChild(input);
+      distWrap.appendChild(spanM);
+      tdDist.appendChild(distWrap);
+
+      // Olaylar
+      select.addEventListener('change', () => {
+        edge.type = select.value;
+        if (edge.type === 'road') {
+          edge.distance = getRoadDefault();
+          input.value = edge.distance.toFixed(1);
+        } else if (edge.type === 'side') {
+          edge.distance = getSideDefault();
+          input.value = edge.distance.toFixed(1);
+        } else if (edge.type === 'rear') {
+          edge.distance = getRearDefault();
+          input.value = edge.distance.toFixed(1);
+        }
+        recalcSetback();
+      });
+
+      input.addEventListener('input', () => {
+        const val = parseFloat(input.value);
+        if (!isNaN(val) && val >= 0) {
+          edge.distance = val;
+          if (edge.type !== 'custom' &&
+              ((edge.type === 'road' && val !== getRoadDefault()) ||
+               (edge.type === 'side' && val !== getSideDefault()) ||
+               (edge.type === 'rear' && val !== getRearDefault()))) {
+            edge.type = 'custom';
+            select.value = 'custom';
+          }
+          recalcSetback();
+        }
+      });
+
+      tr.appendChild(tdIdx);
+      tr.appendChild(tdLen);
+      tr.appendChild(tdType);
+      tr.appendChild(tdDist);
+      setbackEdgesTableBody.appendChild(tr);
+    });
+  }
+
+  function recalcSetback() {
+    if (!currentPolyPoints || currentPolyPoints.length < 3) return;
+
+    const distances = currentEdges.map(e => Math.max(0, Number(e.distance) || 0));
+    const res = cad.computePolygonSetback(currentPolyPoints, distances);
+    currentResult = res;
+
+    if (res && res.success) {
+      cad.setSetbackPreview({
+        originalPoints: currentPolyPoints,
+        setbackPoints: res.points,
+        distances: distances,
+        edgeTypes: currentEdges.map(e => e.type)
+      });
+
+      if (sbOrigAreaText) sbOrigAreaText.textContent = `${res.originalArea.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+      if (sbNewAreaText) sbNewAreaText.textContent = `${res.newArea.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+      if (sbTaksText) sbTaksText.textContent = `%${res.taksRatio.toFixed(1)}`;
+      if (sbGardenAreaText) sbGardenAreaText.textContent = `${res.gardenArea.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+      if (sbPerimeterText) sbPerimeterText.textContent = `${res.perimeter.toFixed(2)} m`;
+
+      if (setbackStatusMsg) {
+        setbackStatusMsg.style.display = 'block';
+        setbackStatusMsg.className = 'setback-status-msg success';
+        setbackStatusMsg.textContent = `✅ Yapı yaklaşma sınırı hesaplandı. Taban Alanı: ${res.newArea.toFixed(2)} m² (TAKS: %${res.taksRatio.toFixed(1)})`;
+      }
+
+      if (btnSetbackCommit) btnSetbackCommit.disabled = false;
+      if (btnSetbackExportDxf) btnSetbackExportDxf.disabled = false;
+    } else {
+      cad.clearSetbackPreview();
+      if (sbNewAreaText) sbNewAreaText.textContent = '0.00 m²';
+      if (sbTaksText) sbTaksText.textContent = '%0.0';
+      if (sbGardenAreaText) sbGardenAreaText.textContent = '-';
+      if (sbPerimeterText) sbPerimeterText.textContent = '-';
+
+      if (setbackStatusMsg) {
+        setbackStatusMsg.style.display = 'block';
+        setbackStatusMsg.className = 'setback-status-msg error';
+        setbackStatusMsg.textContent = `⚠️ ${res && res.error ? res.error : 'Girilen çekme mesafeleri parsel boyutlarını aşıyor veya geçersiz alan oluşuyor.'}`;
+      }
+
+      if (btnSetbackCommit) btnSetbackCommit.disabled = true;
+      if (btnSetbackExportDxf) btnSetbackExportDxf.disabled = true;
+    }
+  }
+
+  // Ön ayar butonları
+  if (btnApplyAllSide) {
+    btnApplyAllSide.addEventListener('click', () => {
+      const sideDef = getSideDefault();
+      currentEdges.forEach(e => {
+        e.type = 'side';
+        e.distance = sideDef;
+      });
+      renderEdgesTable();
+      recalcSetback();
+    });
+  }
+
+  if (btnApplyStandard) {
+    btnApplyStandard.addEventListener('click', () => {
+      const roadDef = getRoadDefault();
+      const sideDef = getSideDefault();
+      currentEdges.forEach((e, idx) => {
+        if (idx === 0) {
+          e.type = 'road';
+          e.distance = roadDef;
+        } else {
+          e.type = 'side';
+          e.distance = sideDef;
+        }
+      });
+      renderEdgesTable();
+      recalcSetback();
+    });
+  }
+
+  [inpSetbackRoadDefault, inpSetbackSideDefault, inpSetbackRearDefault].forEach(inp => {
+    if (inp) {
+      inp.addEventListener('change', () => {
+        currentEdges.forEach(e => {
+          if (e.type === 'road') e.distance = getRoadDefault();
+          else if (e.type === 'side') e.distance = getSideDefault();
+          else if (e.type === 'rear') e.distance = getRearDefault();
+        });
+        renderEdgesTable();
+        recalcSetback();
+      });
+    }
+  });
+
+  // Kapat / Vazgeç
+  if (btnSetbackClose) btnSetbackClose.addEventListener('click', closeSetbackModal);
+  if (btnSetbackCancel) btnSetbackCancel.addEventListener('click', closeSetbackModal);
+
+  // Çizime Ekle & Kaydet
+  if (btnSetbackCommit) {
+    btnSetbackCommit.addEventListener('click', () => {
+      if (!currentResult || !currentResult.success) return;
+      const created = cad.commitSetbackAsEntity(currentResult, "YAPI_YAKLASMA");
+      if (created) {
+        if (typeof renderLayersList === 'function') renderLayersList();
+        closeSetbackModal();
+        if (typeof hudSelection !== 'undefined' && hudSelection) {
+          hudSelection.textContent = `✅ Yapı yaklaşma sınırı "YAPI_YAKLASMA" tabakasına eklendi (Taban: ${currentResult.newArea.toFixed(2)} m², TAKS: %${currentResult.taksRatio.toFixed(1)})`;
+        }
+      }
+    });
+  }
+
+  // DXF Olarak Dışa Aktar
+  if (btnSetbackExportDxf) {
+    btnSetbackExportDxf.addEventListener('click', () => {
+      if (!currentResult || !currentResult.success || !currentPolyPoints) return;
+      exportSetbackDxf(currentPolyPoints, currentResult.points, currentResult);
+    });
+  }
+
+  function exportSetbackDxf(parcelPts, footprintPts, stats) {
+    let dxf = "0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n";
+    dxf += "0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLAYER\n";
+    // Layer PARSEL
+    dxf += "0\nLAYER\n2\nPARSEL\n70\n0\n62\n7\n6\nCONTINUOUS\n0\n";
+    // Layer YAPI_YAKLASMA
+    dxf += "0\nLAYER\n2\nYAPI_YAKLASMA\n70\n0\n62\n1\n6\nDASHED\n0\n";
+    dxf += "ENDTAB\n0\nENDSEC\n";
+
+    dxf += "0\nSECTION\n2\nENTITIES\n";
+
+    // Parsel Polyline
+    dxf += "0\nPOLYLINE\n8\nPARSEL\n66\n1\n70\n1\n";
+    for (const p of parcelPts) {
+      dxf += `0\nVERTEX\n8\nPARSEL\n10\n${p.x.toFixed(4)}\n20\n${p.y.toFixed(4)}\n30\n0.0\n`;
+    }
+    dxf += "0\nSEQEND\n";
+
+    // Yapı Yaklaşma Polyline
+    dxf += "0\nPOLYLINE\n8\nYAPI_YAKLASMA\n66\n1\n70\n1\n";
+    for (const p of footprintPts) {
+      dxf += `0\nVERTEX\n8\nYAPI_YAKLASMA\n10\n${p.x.toFixed(4)}\n20\n${p.y.toFixed(4)}\n30\n0.0\n`;
+    }
+    dxf += "0\nSEQEND\n";
+
+    // Bina Taban Alanı Text
+    if (footprintPts.length > 0) {
+      let cx = 0, cy = 0;
+      footprintPts.forEach(p => { cx += p.x; cy += p.y; });
+      cx /= footprintPts.length;
+      cy /= footprintPts.length;
+      dxf += `0\nTEXT\n8\nYAPI_YAKLASMA\n10\n${cx.toFixed(4)}\n20\n${cy.toFixed(4)}\n30\n0.0\n40\n1.2\n1\nBINA TABAN ALANI: ${stats.newArea.toFixed(2)} m2 (TAKS: %${stats.taksRatio.toFixed(1)})\n`;
+    }
+
+    dxf += "0\nENDSEC\n0\nEOF\n";
+
+    const blob = new Blob([dxf], { type: "application/dxf;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `yapi_yaklasma_oturum_${Date.now()}.dxf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // Buton Tetikleyicileri
+  if (btnOpenSetbackTool) {
+    btnOpenSetbackTool.addEventListener('click', () => {
+      openSetbackModal();
+    });
+  }
+
+  if (btnResOpenSetback) {
+    btnResOpenSetback.addEventListener('click', () => {
+      openSetbackModal();
+    });
+  }
+
+  if (btnEntSetback) {
+    btnEntSetback.addEventListener('click', () => {
+      if (currentSelectedInfo && currentSelectedInfo.entity && currentSelectedInfo.entity.points) {
+        openSetbackModal(currentSelectedInfo.entity.points);
+      } else if (cad.selectedEntity && cad.selectedEntity.points) {
+        openSetbackModal(cad.selectedEntity.points);
+      } else {
+        openSetbackModal();
+      }
+    });
+  }
+
+  // Global ESC kontrolü
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && setbackModal.style.display !== 'none') {
+      closeSetbackModal();
+    }
+  });
+
+  // Global erişim
+  window.openSetbackModal = openSetbackModal;
+})();
